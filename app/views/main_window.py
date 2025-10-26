@@ -15,6 +15,7 @@ from qfluentwidgets import (
     InfoBar,
     InfoBarPosition
 )
+from app.views.business_registration_view import BusinessRegistrationInterface
 
 
 class MainWindow(FluentWindow):
@@ -54,6 +55,16 @@ class MainWindow(FluentWindow):
             self.home_interface,
             FluentIcon.HOME,
             "홈",
+            NavigationItemPosition.TOP
+        )
+        
+        # 사업장 정보 등록 페이지 추가
+        self.business_registration_interface = BusinessRegistrationInterface()
+        self.business_registration_interface.setObjectName("business_registration_interface")
+        self.addSubInterface(
+            self.business_registration_interface,
+            FluentIcon.PEOPLE,
+            "사업장 정보 등록",
             NavigationItemPosition.TOP
         )
         
@@ -174,8 +185,13 @@ class HomeInterface(QWidget):
         button_layout = QHBoxLayout()
         button_layout.setSpacing(15)
         
+        # 사업장 정보 등록 버튼
+        business_registration_button = PrimaryPushButton("사업장 정보 등록")
+        business_registration_button.clicked.connect(self._on_business_registration_button_clicked)
+        button_layout.addWidget(business_registration_button)
+        
         # 엑셀 파일 업로드 버튼
-        upload_button = PrimaryPushButton("엑셀 파일 업로드")
+        upload_button = PushButton("엑셀 파일 업로드")
         upload_button.clicked.connect(self._on_upload_button_clicked)
         button_layout.addWidget(upload_button)
         
@@ -186,6 +202,18 @@ class HomeInterface(QWidget):
         
         layout.addLayout(button_layout)
         layout.addStretch()
+    
+    def _on_business_registration_button_clicked(self) -> None:
+        """
+        사업장 정보 등록 버튼 클릭 이벤트 처리
+        """
+        # 메인 윈도우의 네비게이션을 사업장 정보 등록 페이지로 변경
+        main_window = self.parent()
+        while main_window and not isinstance(main_window, FluentWindow):
+            main_window = main_window.parent()
+        
+        if main_window:
+            main_window.stackedWidget.setCurrentWidget(main_window.business_registration_interface)
     
     def _on_upload_button_clicked(self) -> None:
         """
