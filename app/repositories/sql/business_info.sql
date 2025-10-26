@@ -4,16 +4,16 @@
 -- 사업장정보 테이블 생성
 CREATE TABLE IF NOT EXISTS business_info (
     -- 사업자등록번호 (Primary Key)
-    business_registration_number VARCHAR(10) PRIMARY KEY,
+    business_number VARCHAR(10) PRIMARY KEY,
     
     -- 사업자명 (필수)
     business_name VARCHAR(255) NOT NULL,
     
     -- 대표자명 (필수)
-    representative_name VARCHAR(100) NOT NULL,
+    owner_name VARCHAR(100) NOT NULL,
     
     -- 대표자주민등록번호 (유니크)
-    representative_resident_number VARCHAR(13) UNIQUE,
+    owner_resident_number VARCHAR(13) UNIQUE,
     
     -- 업태
     business_type VARCHAR(100),
@@ -43,8 +43,8 @@ CREATE INDEX IF NOT EXISTS idx_business_info_business_name
 ON business_info(business_name);
 
 -- 대표자명으로 검색할 때 성능 향상을 위한 인덱스
-CREATE INDEX IF NOT EXISTS idx_business_info_representative_name 
-ON business_info(representative_name);
+CREATE INDEX IF NOT EXISTS idx_business_info_owner_name 
+ON business_info(owner_name);
 
 -- 업태로 검색할 때 성능 향상을 위한 인덱스
 CREATE INDEX IF NOT EXISTS idx_business_info_business_type 
@@ -62,7 +62,7 @@ CREATE TRIGGER IF NOT EXISTS update_business_info_updated_at
 BEGIN
     UPDATE business_info 
     SET updated_at = CURRENT_TIMESTAMP 
-    WHERE business_registration_number = NEW.business_registration_number;
+    WHERE business_number = NEW.business_number;
 END;
 
 -- 테이블 코멘트 (SQLite는 코멘트를 직접 지원하지 않으므로 별도 문서로 관리)

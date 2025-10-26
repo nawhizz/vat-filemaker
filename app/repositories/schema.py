@@ -23,7 +23,7 @@ class BusinessInfo(Base):
     __tablename__ = 'business_info'
     
     # 사업자등록번호 (Primary Key)
-    business_registration_number = Column(
+    business_number = Column(
         String(10), 
         primary_key=True, 
         comment='사업자등록번호'
@@ -37,14 +37,14 @@ class BusinessInfo(Base):
     )
     
     # 대표자명
-    representative_name = Column(
+    owner_name = Column(
         String(100), 
         nullable=False, 
         comment='대표자명'
     )
     
     # 대표자주민등록번호 (Unique)
-    representative_resident_number = Column(
+    owner_resident_number = Column(
         String(13), 
         unique=True, 
         comment='대표자주민등록번호'
@@ -99,17 +99,17 @@ class BusinessInfo(Base):
         """
         객체의 문자열 표현을 반환합니다.
         """
-        return f"<BusinessInfo(business_registration_number='{self.business_registration_number}', business_name='{self.business_name}')>"
+        return f"<BusinessInfo(business_number='{self.business_number}', business_name='{self.business_name}')>"
     
     def to_dict(self) -> dict:
         """
         객체를 딕셔너리로 변환합니다.
         """
         return {
-            'business_registration_number': self.business_registration_number,
+            'business_number': self.business_number,
             'business_name': self.business_name,
-            'representative_name': self.representative_name,
-            'representative_resident_number': self.representative_resident_number,
+            'owner_name': self.owner_name,
+            'owner_resident_number': self.owner_resident_number,
             'business_type': self.business_type,
             'business_category': self.business_category,
             'address': self.address,
@@ -125,10 +125,10 @@ class BusinessInfo(Base):
         딕셔너리로부터 객체를 생성합니다.
         """
         return cls(
-            business_registration_number=data.get('business_registration_number'),
+            business_number=data.get('business_number'),
             business_name=data.get('business_name'),
-            representative_name=data.get('representative_name'),
-            representative_resident_number=data.get('representative_resident_number'),
+            owner_name=data.get('owner_name'),
+            owner_resident_number=data.get('owner_resident_number'),
             business_type=data.get('business_type'),
             business_category=data.get('business_category'),
             address=data.get('address'),

@@ -60,7 +60,7 @@ class BusinessInfoRepository:
             BusinessInfo 객체 또는 None
         """
         return self.session.query(BusinessInfo).filter(
-            BusinessInfo.business_registration_number == registration_number
+            BusinessInfo.business_number == registration_number
         ).first()
     
     def get_by_resident_number(self, resident_number: str) -> Optional[BusinessInfo]:
@@ -74,7 +74,7 @@ class BusinessInfoRepository:
             BusinessInfo 객체 또는 None
         """
         return self.session.query(BusinessInfo).filter(
-            BusinessInfo.representative_resident_number == resident_number
+            BusinessInfo.owner_resident_number == resident_number
         ).first()
     
     def get_by_business_name(self, business_name: str) -> List[BusinessInfo]:
@@ -102,7 +102,7 @@ class BusinessInfoRepository:
             BusinessInfo 객체 리스트
         """
         return self.session.query(BusinessInfo).filter(
-            BusinessInfo.representative_name.like(f"%{representative_name}%")
+            BusinessInfo.owner_name.like(f"%{representative_name}%")
         ).all()
     
     def get_by_business_type(self, business_type: str) -> List[BusinessInfo]:
@@ -195,7 +195,7 @@ class BusinessInfoRepository:
             존재 여부
         """
         return self.session.query(BusinessInfo).filter(
-            BusinessInfo.business_registration_number == registration_number
+            BusinessInfo.business_number == registration_number
         ).first() is not None
     
     def count(self) -> int:
@@ -219,7 +219,7 @@ class BusinessInfoRepository:
         """
         return self.session.query(BusinessInfo).filter(
             BusinessInfo.business_name.like(f"%{search_term}%") |
-            BusinessInfo.representative_name.like(f"%{search_term}%") |
+            BusinessInfo.owner_name.like(f"%{search_term}%") |
             BusinessInfo.business_type.like(f"%{search_term}%") |
             BusinessInfo.business_category.like(f"%{search_term}%")
         ).all()
