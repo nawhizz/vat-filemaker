@@ -64,7 +64,9 @@ class BusinessRegistrationInterface(QWidget):
         # 사업자등록번호
         self.business_number_input = LineEdit()
         self.business_number_input.setPlaceholderText("예: 123-45-67890")
-        self.business_number_input.setMaxLength(12)  # 하이픈 포함
+        self.business_number_input.setMaxLength(12)  # 하이픈 포함 최대 길이
+        # 숫자와 하이픈만 입력 가능하도록 설정
+        self.business_number_input.setValidator(None)  # 기본 검증기 제거
         form_layout.addRow("사업자등록번호 *", self.business_number_input)
         
         # 사업자명
@@ -150,22 +152,96 @@ class BusinessRegistrationInterface(QWidget):
         """
         시그널 연결
         """
-        # 사업자등록번호 입력 시 자동 조회
+        # 사업자등록번호 입력 시 자동 조회 및 포맷 변환
         self.business_number_input.textChanged.connect(self._on_business_number_changed)
     
     def _on_business_number_changed(self, text: str) -> None:
         """
-        사업자등록번호 입력 변경 시 자동 조회
+        사업자등록번호 입력 변경 시 자동 포맷 변환 및 조회
         
         Args:
             text: 입력된 사업자등록번호
         """
-        if len(text) >= 10:  # 최소 길이 확인
-            self._load_business_info(text)
+        # 하이픈 제거한 순수 숫자만 추출
+        clean_text = text.replace('-', '')
+        
+        # 숫자만 입력되도록 제한
+        if not clean_text.isdigit():
+            return
+        
+        # 10자리를 초과하면 입력 제한
+        if len(clean_text) > 10:
+            # 마지막 입력을 제거
+            self.business_number_input.textChanged.disconnect()
+            self.business_number_input.setText(clean_text[:10])
+            self.business_number_input.textChanged.connect(self._on_business_number_changed)
+            return
+        
+        # 10자리 숫자가 입력되면 자동 포맷 변환
+        if len(clean_text) == 10:
+            formatted_text = self.business_service.format_business_number(clean_text)
+            
+            # 포맷 변환이 일어났다면 입력 필드 업데이트
+            if formatted_text != text:
+                # 시그널 연결을 일시적으로 해제하여 무한 루프 방지
+                self.business_number_input.textChanged.disconnect()
+                self.business_number_input.setText(formatted_text)
+                self.business_number_input.textChanged.connect(self._on_business_number_changed)
+    
+    def _load_business_info_safe(self, business_number: str) -> None:
+        """
+        사업장 정보 안전 조회 (폼 초기화 없음)
+        
+        Args:
+            business_number: 사업자등록번호
+        """
+        try:
+            business_info = self.business_service.get_business_info(business_number)
+            if business_info:
+                # 기존 데이터가 있으면 폼에 채우기
+                self._populate_form(business_info)
+                self.current_business_number = business_number
+                self.register_button.setVisible(False)
+                self.update_button.setVisible(True)
+                
+                InfoBar.info(
+                    title="정보",
+                    content="기존 사업장 정보를 불러왔습니다.",
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.TOP,
+                    duration=3000,
+                    parent=self
+                )
+            else:
+                # 기존 데이터가 없으면 폼 초기화하지 않고 등록 모드로 설정
+                self.current_business_number = None
+                self.register_button.setVisible(True)
+                self.update_button.setVisible(False)
+                
+                InfoBar.info(
+                    title="정보",
+                    content="새로운 사업장 정보를 등록할 수 있습니다.",
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.TOP,
+                    duration=3000,
+                    parent=self
+                )
+        except Exception as e:
+            InfoBar.error(
+                title="오류",
+                content=f"사업장 정보 조회 중 오류가 발생했습니다: {str(e)}",
+                orient=Qt.Horizontal,
+                isClosable=True,
+                position=InfoBarPosition.TOP,
+                duration=5000,
+                parent=self
+            )
     
     def _load_business_info(self, business_number: str) -> None:
         """
-        사업장 정보 로드
+        사업장 정보 로드 (조회 버튼용 - 폼 초기화 포함)
         
         Args:
             business_number: 사업자등록번호
@@ -188,10 +264,21 @@ class BusinessRegistrationInterface(QWidget):
                     parent=self
                 )
             else:
+                # 조회 버튼을 통한 조회 시에는 폼 초기화
                 self._clear_form()
                 self.current_business_number = None
                 self.register_button.setVisible(True)
                 self.update_button.setVisible(False)
+                
+                InfoBar.warning(
+                    title="조회 결과",
+                    content="해당 사업자등록번호로 등록된 정보가 없습니다.",
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.TOP,
+                    duration=3000,
+                    parent=self
+                )
         except Exception as e:
             InfoBar.error(
                 title="오류",
@@ -388,7 +475,9 @@ class BusinessRegistrationInterface(QWidget):
         """
         business_number = self.business_number_input.text().strip()
         if business_number:
-            self._load_business_info(business_number)
+            # 하이픈 제거하고 DB 조회
+            clean_business_number = business_number.replace('-', '')
+            self._load_business_info(clean_business_number)
         else:
             InfoBar.warning(
                 title="조회 오류",

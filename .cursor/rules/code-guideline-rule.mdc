@@ -110,7 +110,33 @@ Strictly adhere to the **MVA (Model-View-Architecture)** and **Layered Architect
 * Use **`pytest-mock`** to Mock dependencies (e.g., DB, API).
 
 ### Logging
-* Avoid using `print()`. Use the **`loguru` package** for logging functionality.
+* Avoid using `print()`. Use the **`loguru` package` for logging functionality.
 * Configure the logger in `app/utils/logger.py` or `main.py`.
 * Clearly differentiate and use `DEBUG`, `INFO`, `WARNING`, and `ERROR` levels for recording logs.
 * Utilize loguru's advanced features such as structured logging, automatic serialization, and better formatting.
+
+---
+
+## 6. 🔄 Git and Version Control
+
+### GitHub Commit Policy
+* **Manual Commits Only**: GitHub commits and pushes should **ONLY** be performed when explicitly requested by the user.
+* **No Automatic Commits**: Do not automatically commit or push changes to GitHub without explicit user instruction.
+* **User Confirmation Required**: Always ask for user confirmation before performing any Git operations that affect the remote repository.
+* **Local Development**: Focus on local development and testing. Only commit when the user specifically asks for it.
+
+### Commit Message Guidelines
+* Use **conventional commit format**: `type(scope): description`
+  * **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+  * **Scope**: Component or module name (e.g., `ui`, `service`, `database`)
+  * **Description**: Clear, concise description of changes
+* **Examples**:
+  * `feat(ui): add business registration form`
+  * `fix(service): resolve database connection issue`
+  * `refactor(repository): update column names in business_info table`
+
+### Git Workflow
+* **Local First**: Always test changes locally before committing
+* **Incremental Commits**: Make small, focused commits rather than large batches
+* **Branch Strategy**: Use feature branches for major changes
+* **Code Review**: Review all changes before committing to main branch
