@@ -5,7 +5,8 @@
 """
 
 from typing import Optional, Dict, Any
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QRegularExpression
+from PySide6.QtGui import QRegularExpressionValidator
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QFormLayout, QLabel, QLineEdit, QTextEdit
 from qfluentwidgets import (
     PrimaryPushButton, 
@@ -65,8 +66,11 @@ class BusinessRegistrationInterface(QWidget):
         self.business_number_input = LineEdit()
         self.business_number_input.setPlaceholderText("예: 123-45-67890")
         self.business_number_input.setMaxLength(12)  # 하이픈 포함 최대 길이
-        # 숫자와 하이픈만 입력 가능하도록 설정
-        self.business_number_input.setValidator(None)  # 기본 검증기 제거
+        # 숫자만 입력 가능하도록 Validator 설정 (하이픈은 자동 추가)
+        regex_validator_business = QRegularExpressionValidator(
+            QRegularExpression(r"^[0-9]*$"), self
+        )
+        self.business_number_input.setValidator(regex_validator_business)
         form_layout.addRow("사업자등록번호 *", self.business_number_input)
         
         # 사업자명
@@ -85,7 +89,12 @@ class BusinessRegistrationInterface(QWidget):
         self.owner_resident_number_input = LineEdit()
         self.owner_resident_number_input.setPlaceholderText("예: 123456-1234567")
         self.owner_resident_number_input.setMaxLength(14)  # 하이픈 포함
-        form_layout.addRow("대표자주민등록번호", self.owner_resident_number_input)
+        # 숫자만 입력 가능하도록 Validator 설정 (하이픈은 자동 추가)
+        regex_validator_resident = QRegularExpressionValidator(
+            QRegularExpression(r"^[0-9]*$"), self
+        )
+        self.owner_resident_number_input.setValidator(regex_validator_resident)
+        form_layout.addRow("대표자주민등록번호 *", self.owner_resident_number_input)
         
         # 업태
         self.business_type_input = LineEdit()
@@ -103,13 +112,22 @@ class BusinessRegistrationInterface(QWidget):
         self.address_input = TextEdit()
         self.address_input.setPlaceholderText("주소를 입력하세요")
         self.address_input.setMaximumHeight(80)
+        # Tab 키 입력 시 포커스 이동되도록 설정
+        self.address_input.setTabChangesFocus(True)
         form_layout.addRow("주소", self.address_input)
         
         # 전화번호
         self.phone_number_input = LineEdit()
         self.phone_number_input.setPlaceholderText("예: 02-1234-5678")
-        self.phone_number_input.setMaxLength(20)
+        self.phone_number_input.setMaxLength(13)  # 하이픈 포함 최대 길이
+        # 숫자만 입력 가능하도록 Validator 설정 (하이픈은 자동 추가)
+        regex_validator_phone = QRegularExpressionValidator(
+            QRegularExpression(r"^[0-9]*$"), self
+        )
+        self.phone_number_input.setValidator(regex_validator_phone)
         form_layout.addRow("전화번호", self.phone_number_input)
+        # 탭 순서: 주소 -> 전화번호
+        QWidget.setTabOrder(self.address_input, self.phone_number_input)
         
         # 이메일
         self.email_input = LineEdit()
@@ -152,12 +170,18 @@ class BusinessRegistrationInterface(QWidget):
         """
         시그널 연결
         """
-        # 사업자등록번호 입력 시 자동 조회 및 포맷 변환
+        # 사업자등록번호 입력 시 포맷 변환
         self.business_number_input.textChanged.connect(self._on_business_number_changed)
+
+        # 대표자주민등록번호호 입력 시 포맷 변환
+        self.owner_resident_number_input.textChanged.connect(self._on_owner_resident_number_changed)
+        
+        # 전화번호 입력 시 포맷 변환
+        self.phone_number_input.textChanged.connect(self._on_phone_number_changed)
     
     def _on_business_number_changed(self, text: str) -> None:
         """
-        사업자등록번호 입력 변경 시 자동 포맷 변환 및 조회
+        사업자등록번호 입력 변경 시 자동 포맷 변환 (xxx-xx-xxxxx)
         
         Args:
             text: 입력된 사업자등록번호
@@ -167,27 +191,114 @@ class BusinessRegistrationInterface(QWidget):
         
         # 숫자만 입력되도록 제한
         if not clean_text.isdigit():
+            # 숫자가 아니면 하이픈만 남기거나 빈 문자열로 만들기
+            clean_text = ''.join(c for c in clean_text if c.isdigit())
+            if clean_text:
+                self.business_number_input.textChanged.disconnect()
+                self.business_number_input.setText(clean_text)
+                self.business_number_input.textChanged.connect(self._on_business_number_changed)
             return
         
         # 10자리를 초과하면 입력 제한
         if len(clean_text) > 10:
-            # 마지막 입력을 제거
+            clean_text = clean_text[:10]
+        
+        # 자동 포맷팅: xxx-xx-xxxxx
+        formatted_text = ""
+        if len(clean_text) > 5:  # 7자리 이상: xxx-xx-xxxxx
+            formatted_text = f"{clean_text[:3]}-{clean_text[3:5]}-{clean_text[5:]}"
+        elif len(clean_text) > 3:  # 4-6자리: xxx-xx or xxx-xxxx
+            formatted_text = f"{clean_text[:3]}-{clean_text[3:]}"
+        else:  # 3자리 이하: xxx
+            formatted_text = clean_text
+        
+        # 포맷 변환이 일어났다면 입력 필드 업데이트
+        if formatted_text != text:
+            # 시그널 연결을 일시적으로 해제하여 무한 루프 방지
             self.business_number_input.textChanged.disconnect()
-            self.business_number_input.setText(clean_text[:10])
+            self.business_number_input.setText(formatted_text)
             self.business_number_input.textChanged.connect(self._on_business_number_changed)
+    
+    def _on_owner_resident_number_changed(self, text: str) -> None:
+        """
+        대표자주민등록번호 입력 변경 시 자동 포맷 변환 (xxxxxx-xxxxxxx)
+        
+        Args:
+            text: 입력된 주민등록번호
+        """
+        # 하이픈 제거한 순수 숫자만 추출
+        clean_text = text.replace('-', '')
+        
+        # 숫자만 입력되도록 제한
+        if not clean_text.isdigit():
+            # 숫자가 아니면 하이픈만 남기거나 빈 문자열로 만들기
+            clean_text = ''.join(c for c in clean_text if c.isdigit())
+            if clean_text:
+                self.owner_resident_number_input.textChanged.disconnect()
+                self.owner_resident_number_input.setText(clean_text)
+                self.owner_resident_number_input.textChanged.connect(self._on_owner_resident_number_changed)
             return
         
-        # 10자리 숫자가 입력되면 자동 포맷 변환
-        if len(clean_text) == 10:
-            formatted_text = self.business_service.format_business_number(clean_text)
-            
-            # 포맷 변환이 일어났다면 입력 필드 업데이트
-            if formatted_text != text:
-                # 시그널 연결을 일시적으로 해제하여 무한 루프 방지
-                self.business_number_input.textChanged.disconnect()
-                self.business_number_input.setText(formatted_text)
-                self.business_number_input.textChanged.connect(self._on_business_number_changed)
-    
+        # 10자리를 초과하면 입력 제한
+        if len(clean_text) > 13:
+            clean_text = clean_text[:13]
+        
+        # 자동 포맷팅: xxxxx-xxxxxxx
+        formatted_text = ""
+        if len(clean_text) > 6:  # 7자리 이상: xxxxx-xxxxxxx
+            formatted_text = f"{clean_text[:6]}-{clean_text[6:]}"
+        else:  # 6자리 이하: xxxxx
+            formatted_text = clean_text
+        
+        # 포맷 변환이 일어났다면 입력 필드 업데이트
+        if formatted_text != text:
+            # 시그널 연결을 일시적으로 해제하여 무한 루프 방지
+            self.owner_resident_number_input.textChanged.disconnect()
+            self.owner_resident_number_input.setText(formatted_text)
+            self.owner_resident_number_input.textChanged.connect(self._on_owner_resident_number_changed)
+
+    def _on_phone_number_changed(self, text: str) -> None:
+        """
+        전화번호 입력 변경 시 자동 포맷 변환 (xx-xxxx-xxxx 또는 xxx-xxxx-xxxx)
+        
+        Args:
+            text: 입력된 전화번호
+        """
+        # 하이픈 제거한 순수 숫자만 추출
+        clean_text = text.replace('-', '')
+        
+        # 숫자만 입력되도록 제한
+        if not clean_text.isdigit():
+            clean_text = ''.join(c for c in clean_text if c.isdigit())
+            if clean_text:
+                self.phone_number_input.textChanged.disconnect()
+                self.phone_number_input.setText(clean_text)
+                self.phone_number_input.textChanged.connect(self._on_phone_number_changed)
+            return
+        
+        # 지역번호 길이 및 총 자릿수 결정: '02'는 총 10자리, 그 외 11자리
+        area_len = 2 if clean_text.startswith('02') else 3
+        max_digits = 10 if area_len == 2 else 11
+
+        # 총 자릿수 제한 적용
+        if len(clean_text) > max_digits:
+            clean_text = clean_text[:max_digits]
+
+        # 포맷팅: area-mid-last (mid 4, last 4)
+        formatted_text = ""
+        if len(clean_text) <= area_len:
+            formatted_text = clean_text
+        elif len(clean_text) <= area_len + 4:
+            formatted_text = f"{clean_text[:area_len]}-{clean_text[area_len:]}"
+        else:
+            mid_end = area_len + 4
+            formatted_text = f"{clean_text[:area_len]}-{clean_text[area_len:mid_end]}-{clean_text[mid_end:]}"
+        
+        if formatted_text != text:
+            self.phone_number_input.textChanged.disconnect()
+            self.phone_number_input.setText(formatted_text)
+            self.phone_number_input.textChanged.connect(self._on_phone_number_changed)
+
     def _load_business_info_safe(self, business_number: str) -> None:
         """
         사업장 정보 안전 조회 (폼 초기화 없음)
@@ -337,7 +448,7 @@ class BusinessRegistrationInterface(QWidget):
             유효성 검사 결과
         """
         # 필수 필드 검사
-        required_fields = ['business_number', 'business_name', 'owner_name']
+        required_fields = ['business_number', 'business_name', 'owner_name', 'owner_resident_number']
         for field in required_fields:
             if not data[field]:
                 InfoBar.warning(
