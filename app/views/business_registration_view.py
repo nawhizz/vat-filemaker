@@ -1,7 +1,7 @@
 """
-사업장 정보 등록 인터페이스
+사업자 정보 등록 인터페이스
 
-사업장 정보를 등록하고 수정하는 페이지를 구현합니다.
+사업자 정보를 등록하고 수정하는 페이지를 구현합니다.
 """
 
 from typing import Optional, Dict, Any
@@ -24,9 +24,9 @@ from app.services.business_service import BusinessService
 
 class BusinessRegistrationInterface(QWidget):
     """
-    사업장 정보 등록 인터페이스
+    사업자 정보 등록 인터페이스
     
-    사업장 정보를 등록하고 관리하는 페이지입니다.
+    사업자 정보를 등록하고 관리하는 페이지입니다.
     """
     
     # 데이터 변경 시그널
@@ -41,18 +41,18 @@ class BusinessRegistrationInterface(QWidget):
     
     def _init_ui(self) -> None:
         """
-        사업장 정보 등록 인터페이스 UI 초기화
+        사업자 정보 등록 인터페이스 UI 초기화
         """
         layout = QVBoxLayout(self)
         layout.setContentsMargins(30, 30, 30, 30)
         layout.setSpacing(20)
         
         # 제목
-        title_label = TitleLabel("사업장 정보 등록")
+        title_label = TitleLabel("사업자 정보 등록")
         layout.addWidget(title_label)
         
         # 설명
-        description_label = BodyLabel("사업장의 기본 정보를 입력하여 등록하세요.")
+        description_label = BodyLabel("사업자의 기본 정보를 입력하여 등록하세요.")
         layout.addWidget(description_label)
         
         # 입력 폼 카드
@@ -301,7 +301,7 @@ class BusinessRegistrationInterface(QWidget):
 
     def _load_business_info_safe(self, business_number: str) -> None:
         """
-        사업장 정보 안전 조회 (폼 초기화 없음)
+        사업자 정보 안전 조회 (폼 초기화 없음)
         
         Args:
             business_number: 사업자등록번호
@@ -317,7 +317,7 @@ class BusinessRegistrationInterface(QWidget):
                 
                 InfoBar.info(
                     title="정보",
-                    content="기존 사업장 정보를 불러왔습니다.",
+                    content="기존 사업자 정보를 불러왔습니다.",
                     orient=Qt.Horizontal,
                     isClosable=True,
                     position=InfoBarPosition.TOP,
@@ -332,7 +332,7 @@ class BusinessRegistrationInterface(QWidget):
                 
                 InfoBar.info(
                     title="정보",
-                    content="새로운 사업장 정보를 등록할 수 있습니다.",
+                    content="새로운 사업자 정보를 등록할 수 있습니다.",
                     orient=Qt.Horizontal,
                     isClosable=True,
                     position=InfoBarPosition.TOP,
@@ -342,7 +342,7 @@ class BusinessRegistrationInterface(QWidget):
         except Exception as e:
             InfoBar.error(
                 title="오류",
-                content=f"사업장 정보 조회 중 오류가 발생했습니다: {str(e)}",
+                content=f"사업자 정보 조회 중 오류가 발생했습니다: {str(e)}",
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
@@ -352,7 +352,7 @@ class BusinessRegistrationInterface(QWidget):
     
     def _load_business_info(self, business_number: str) -> None:
         """
-        사업장 정보 로드 (조회 버튼용 - 폼 초기화 포함)
+        사업자 정보 로드 (조회 버튼용 - 폼 초기화 포함)
         
         Args:
             business_number: 사업자등록번호
@@ -367,7 +367,7 @@ class BusinessRegistrationInterface(QWidget):
                 
                 InfoBar.info(
                     title="정보",
-                    content="기존 사업장 정보를 불러왔습니다.",
+                    content="기존 사업자 정보를 불러왔습니다.",
                     orient=Qt.Horizontal,
                     isClosable=True,
                     position=InfoBarPosition.TOP,
@@ -393,7 +393,7 @@ class BusinessRegistrationInterface(QWidget):
         except Exception as e:
             InfoBar.error(
                 title="오류",
-                content=f"사업장 정보 조회 중 오류가 발생했습니다: {str(e)}",
+                content=f"사업자 정보 조회 중 오류가 발생했습니다: {str(e)}",
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
@@ -403,10 +403,10 @@ class BusinessRegistrationInterface(QWidget):
     
     def _populate_form(self, business_info: Dict[str, Any]) -> None:
         """
-        폼에 사업장 정보 채우기
+        폼에 사업자 정보 채우기
         
         Args:
-            business_info: 사업장 정보 딕셔너리
+            business_info: 사업자 정보 딕셔너리
         """
         self.business_number_input.setText(business_info.get('business_number', ''))
         self.business_name_input.setText(business_info.get('business_name', ''))
@@ -509,7 +509,7 @@ class BusinessRegistrationInterface(QWidget):
             
             InfoBar.success(
                 title="등록 완료",
-                content="사업장 정보가 성공적으로 등록되었습니다.",
+                content="사업자 정보가 성공적으로 등록되었습니다.",
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
@@ -522,7 +522,7 @@ class BusinessRegistrationInterface(QWidget):
         except Exception as e:
             InfoBar.error(
                 title="등록 오류",
-                content=f"사업장 정보 등록 중 오류가 발생했습니다: {str(e)}",
+                content=f"사업자 정보 등록 중 오류가 발생했습니다: {str(e)}",
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
@@ -550,7 +550,7 @@ class BusinessRegistrationInterface(QWidget):
             
             InfoBar.success(
                 title="수정 완료",
-                content="사업장 정보가 성공적으로 수정되었습니다.",
+                content="사업자 정보가 성공적으로 수정되었습니다.",
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
@@ -563,7 +563,7 @@ class BusinessRegistrationInterface(QWidget):
         except Exception as e:
             InfoBar.error(
                 title="수정 오류",
-                content=f"사업장 정보 수정 중 오류가 발생했습니다: {str(e)}",
+                content=f"사업자 정보 수정 중 오류가 발생했습니다: {str(e)}",
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,

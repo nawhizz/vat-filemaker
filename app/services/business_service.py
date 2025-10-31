@@ -1,7 +1,7 @@
 """
-사업장 정보 서비스
+사업자 정보 서비스
 
-사업장 정보 관련 비즈니스 로직을 처리합니다.
+사업자 정보 관련 비즈니스 로직을 처리합니다.
 """
 
 from typing import Optional, Dict, Any, List
@@ -12,9 +12,9 @@ from app.repositories.schema import BusinessInfo
 
 class BusinessService:
     """
-    사업장 정보 서비스 클래스
+    사업자 정보 서비스 클래스
     
-    사업장 정보 관련 비즈니스 로직을 담당합니다.
+    사업자 정보 관련 비즈니스 로직을 담당합니다.
     """
     
     def __init__(self, database_path: str = "data/vat_filemaker.db"):
@@ -47,10 +47,10 @@ class BusinessService:
     
     def create_business_info(self, business_data: Dict[str, Any]) -> BusinessInfo:
         """
-        새로운 사업장 정보 생성
+        새로운 사업자정보 생성
         
         Args:
-            business_data: 사업장 정보 데이터
+            business_data: 사업자 정보 데이터
             
         Returns:
             생성된 BusinessInfo 객체
@@ -80,17 +80,17 @@ class BusinessService:
         try:
             return self.repository.create(business_data)
         except Exception as e:
-            raise RuntimeError(f"사업장 정보 생성 실패: {e}")
+            raise RuntimeError(f"사업자 정보 생성 실패: {e}")
     
     def get_business_info(self, business_number: str) -> Optional[Dict[str, Any]]:
         """
-        사업장 정보 조회
+        사업자 정보 조회
         
         Args:
             business_number: 사업자등록번호
             
         Returns:
-            사업장 정보 딕셔너리 또는 None
+            사업자 정보 딕셔너리 또는 None
         """
         if not self.repository:
             raise RuntimeError("Repository가 초기화되지 않았습니다.")
@@ -100,14 +100,14 @@ class BusinessService:
     
     def update_business_info(self, business_number: str, update_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
-        사업장 정보 수정
+        사업자 정보 수정
         
         Args:
             business_number: 사업자등록번호
             update_data: 수정할 데이터
             
         Returns:
-            수정된 사업장 정보 딕셔너리 또는 None
+            수정된 사업자 정보 딕셔너리 또는 None
         """
         if not self.repository:
             raise RuntimeError("Repository가 초기화되지 않았습니다.")
@@ -123,11 +123,11 @@ class BusinessService:
             updated_business = self.repository.update(business_number, update_data)
             return updated_business.to_dict() if updated_business else None
         except Exception as e:
-            raise RuntimeError(f"사업장 정보 수정 실패: {e}")
+            raise RuntimeError(f"사업자 정보 수정 실패: {e}")
     
     def delete_business_info(self, business_number: str) -> bool:
         """
-        사업장 정보 삭제
+        사업자 정보 삭제
         
         Args:
             business_number: 사업자등록번호
@@ -141,17 +141,17 @@ class BusinessService:
         try:
             return self.repository.delete(business_number)
         except Exception as e:
-            raise RuntimeError(f"사업장 정보 삭제 실패: {e}")
+            raise RuntimeError(f"사업자 정보 삭제 실패: {e}")
     
     def search_business_info(self, search_term: str) -> List[Dict[str, Any]]:
         """
-        사업장 정보 검색
+        사업자 정보 검색
         
         Args:
             search_term: 검색어
             
         Returns:
-            검색된 사업장 정보 리스트
+            검색된 사업자 정보 리스트
         """
         if not self.repository:
             raise RuntimeError("Repository가 초기화되지 않았습니다.")
@@ -160,18 +160,18 @@ class BusinessService:
             results = self.repository.search(search_term)
             return [business.to_dict() for business in results]
         except Exception as e:
-            raise RuntimeError(f"사업장 정보 검색 실패: {e}")
+            raise RuntimeError(f"사업자 정보 검색 실패: {e}")
     
     def get_all_business_info(self, limit: Optional[int] = None, offset: int = 0) -> List[Dict[str, Any]]:
         """
-        모든 사업장 정보 조회
+        모든 사업자 정보 조회
         
         Args:
             limit: 조회할 최대 개수
             offset: 조회 시작 위치
             
         Returns:
-            사업장 정보 리스트
+            사업자 정보 리스트
         """
         if not self.repository:
             raise RuntimeError("Repository가 초기화되지 않았습니다.")
@@ -180,11 +180,11 @@ class BusinessService:
             results = self.repository.get_all(limit, offset)
             return [business.to_dict() for business in results]
         except Exception as e:
-            raise RuntimeError(f"사업장 정보 조회 실패: {e}")
+            raise RuntimeError(f"사업자 정보 조회 실패: {e}")
     
     def get_business_count(self) -> int:
         """
-        전체 사업장 정보 개수 조회
+        전체 사업자 정보 개수 조회
         
         Returns:
             전체 개수
@@ -195,7 +195,7 @@ class BusinessService:
         try:
             return self.repository.count()
         except Exception as e:
-            raise RuntimeError(f"사업장 정보 개수 조회 실패: {e}")
+            raise RuntimeError(f"사업자 정보 개수 조회 실패: {e}")
     
     def validate_business_number(self, business_number: str) -> bool:
         """
