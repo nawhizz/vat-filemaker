@@ -6,9 +6,11 @@ SQLite 데이터베이스를 초기화하고 테이블을 생성합니다.
 
 import os
 from pathlib import Path
+from typing import Optional
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from app.repositories.schema import Base, BusinessInfo, CardCompanyInfo
+from app.repositories.schema import Base, BusinessInfo, CardCompanyInfo, CardInfo
+from app.config.settings import settings
 
 
 class DatabaseInitializer:
@@ -18,13 +20,15 @@ class DatabaseInitializer:
     SQLite 데이터베이스 생성 및 테이블 초기화를 담당합니다.
     """
     
-    def __init__(self, database_path: str = "data/vat_filemaker.db"):
+    def __init__(self, database_path: Optional[str] = None):
         """
         데이터베이스 초기화자 생성
         
         Args:
-            database_path: 데이터베이스 파일 경로
+            database_path: 데이터베이스 파일 경로 (None인 경우 설정에서 가져옴)
         """
+        if database_path is None:
+            database_path = settings.get_database_path()
         self.database_path = database_path
         self.engine = None
         self.SessionLocal = None
@@ -51,9 +55,11 @@ class DatabaseInitializer:
         database_url = f"sqlite:///{self.database_path}"
         
         # 엔진 생성 (에코 모드로 SQL 쿼리 로깅)
+        # DEBUG 모드일 때만 echo=True
+        echo_mode = settings.DEBUG or settings.DEV_MODE
         self.engine = create_engine(
             database_url,
-            echo=True,  # 개발 시에만 True, 운영에서는 False
+            echo=echo_mode,
             connect_args={"check_same_thread": False}  # SQLite 멀티스레드 지원
         )
         
@@ -146,6 +152,11 @@ class DatabaseInitializer:
             if card_company_info_sql.exists():
                 self.execute_sql_file(str(card_company_info_sql))
             
+            # card_info.sql 실행
+            card_info_sql = Path(__file__).parent / "sql" / "card_info.sql"
+            if card_info_sql.exists():
+                self.execute_sql_file(str(card_info_sql))
+            
             print("데이터베이스 초기화가 완료되었습니다!")
             
         except Exception as e:
@@ -165,7 +176,7 @@ class DatabaseInitializer:
         return self.SessionLocal()
 
 
-def initialize_database(database_path: str = "data/vat_filemaker.db") -> DatabaseInitializer:
+def initialize_database(database_path: Optional[str] = None) -> DatabaseInitializer:
     """
     데이터베이스 초기화 함수
     

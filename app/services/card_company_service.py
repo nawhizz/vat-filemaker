@@ -8,6 +8,7 @@ from typing import Optional, Dict, Any, List
 from app.repositories.database import DatabaseInitializer
 from app.repositories.card_company_repository import CardCompanyRepository
 from app.repositories.schema import CardCompanyInfo
+from app.config.settings import settings
 
 
 class CardCompanyService:
@@ -17,13 +18,15 @@ class CardCompanyService:
   카드사 정보 관련 비즈니스 로직을 담당합니다.
   """
   
-  def __init__(self, database_path: str = "data/vat_filemaker.db"):
+  def __init__(self, database_path: Optional[str] = None):
     """
     서비스 초기화
     
     Args:
-      database_path: 데이터베이스 파일 경로
+      database_path: 데이터베이스 파일 경로 (None인 경우 설정에서 가져옴)
     """
+    if database_path is None:
+      database_path = settings.get_database_path()
     self.db_initializer = DatabaseInitializer(database_path)
     self.repository: Optional[CardCompanyRepository] = None
     self._initialize_repository()

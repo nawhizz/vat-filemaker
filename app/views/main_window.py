@@ -17,6 +17,7 @@ from qfluentwidgets import (
 )
 from app.views.business_registration_view import BusinessRegistrationInterface
 from app.views.card_company_view import CardCompanyInterface
+from app.views.card_view import CardInterface
 
 
 class MainWindow(FluentWindow):
@@ -65,7 +66,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(
             self.business_registration_interface,
             FluentIcon.PEOPLE,
-            "사업장 정보 등록",
+            "사업자자 정보 관리",
             NavigationItemPosition.TOP
         )
         
@@ -74,38 +75,18 @@ class MainWindow(FluentWindow):
         self.card_company_interface.setObjectName("card_company_interface")
         self.addSubInterface(
             self.card_company_interface,
-            FluentIcon.PEOPLE,
+            FluentIcon.CAFE,
             "카드사 정보 관리",
             NavigationItemPosition.TOP
         )
         
-        # 카드 내역 관리 페이지 추가
+        # 카드 정보 등록 페이지 추가
         self.card_interface = CardInterface()
         self.card_interface.setObjectName("card_interface")
         self.addSubInterface(
             self.card_interface,
-            FluentIcon.SHOPPING_CART,
-            "카드 내역",
-            NavigationItemPosition.TOP
-        )
-        
-        # 사업자 관리 페이지 추가
-        self.taxpayer_interface = TaxpayerInterface()
-        self.taxpayer_interface.setObjectName("taxpayer_interface")
-        self.addSubInterface(
-            self.taxpayer_interface,
-            FluentIcon.PEOPLE,
-            "사업자 관리",
-            NavigationItemPosition.TOP
-        )
-        
-        # 부가세 신고 페이지 추가
-        self.vat_interface = VatInterface()
-        self.vat_interface.setObjectName("vat_interface")
-        self.addSubInterface(
-            self.vat_interface,
-            FluentIcon.DOCUMENT,
-            "부가세 신고",
+            FluentIcon.CHAT,
+            "카드 정보 관리",
             NavigationItemPosition.TOP
         )
         
@@ -236,7 +217,7 @@ class HomeInterface(QWidget):
             orient=Qt.Horizontal,
             isClosable=True,
             position=InfoBarPosition.TOP,
-            duration=3000,
+            duration=1000,
             parent=self
         )
     
@@ -250,129 +231,9 @@ class HomeInterface(QWidget):
             orient=Qt.Horizontal,
             isClosable=True,
             position=InfoBarPosition.TOP,
-            duration=3000,
+            duration=1000,
             parent=self
         )
-
-
-class CardInterface(QWidget):
-    """
-    카드 내역 관리 인터페이스
-    
-    카드 사용 내역을 조회하고 관리하는 페이지입니다.
-    """
-    
-    def __init__(self):
-        super().__init__()
-        self._init_ui()
-    
-    def _init_ui(self) -> None:
-        """
-        카드 인터페이스 UI 초기화
-        """
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(30, 30, 30, 30)
-        
-        title_label = QLabel("카드 내역 관리")
-        title_label.setStyleSheet("""
-            QLabel {
-                font-size: 20px;
-                font-weight: bold;
-                color: #333333;
-                margin-bottom: 20px;
-            }
-        """)
-        layout.addWidget(title_label)
-        
-        placeholder_label = QLabel("카드 내역 관리 기능이 곧 구현될 예정입니다.")
-        placeholder_label.setStyleSheet("""
-            QLabel {
-                font-size: 14px;
-                color: #666666;
-            }
-        """)
-        layout.addWidget(placeholder_label)
-        layout.addStretch()
-
-
-class TaxpayerInterface(QWidget):
-    """
-    사업자 관리 인터페이스
-    
-    사업자 정보를 조회하고 관리하는 페이지입니다.
-    """
-    
-    def __init__(self):
-        super().__init__()
-        self._init_ui()
-    
-    def _init_ui(self) -> None:
-        """
-        사업자 인터페이스 UI 초기화
-        """
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(30, 30, 30, 30)
-        
-        title_label = QLabel("사업자 관리")
-        title_label.setStyleSheet("""
-            QLabel {
-                font-size: 20px;
-                font-weight: bold;
-                color: #333333;
-                margin-bottom: 20px;
-            }
-        """)
-        layout.addWidget(title_label)
-        
-        placeholder_label = QLabel("사업자 관리 기능이 곧 구현될 예정입니다.")
-        placeholder_label.setStyleSheet("""
-            QLabel {
-                font-size: 14px;
-                color: #666666;
-            }
-        """)
-        layout.addWidget(placeholder_label)
-        layout.addStretch()
-
-
-class VatInterface(QWidget):
-    """
-    부가세 신고 인터페이스
-    
-    부가세 신고 관련 기능을 제공하는 페이지입니다.
-    """
-    
-    def __init__(self):
-        super().__init__()
-        self._init_ui()
-    
-    def _init_ui(self) -> None:
-        """
-        부가세 신고 인터페이스 UI 초기화
-        """
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(30, 30, 30, 30)
-        
-        title_label = QLabel("부가세 신고")
-        title_label.setStyleSheet("""
-            QLabel {
-                font-size: 20px;
-                font-weight: bold;
-                color: #333333;
-                margin-bottom: 20px;
-            }
-        """)
-        layout.addWidget(title_label)
-        
-        placeholder_label = QLabel("부가세 신고 기능이 곧 구현될 예정입니다.")
-        placeholder_label.setStyleSheet("""
-            QLabel {
-                font-size: 14px;
-                color: #666666;
-            }
-        """)
-        layout.addWidget(placeholder_label)
-        layout.addStretch()
 
 
 class SettingsInterface(QWidget):

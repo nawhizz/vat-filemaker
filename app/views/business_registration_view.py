@@ -321,7 +321,7 @@ class BusinessRegistrationInterface(QWidget):
                     orient=Qt.Horizontal,
                     isClosable=True,
                     position=InfoBarPosition.TOP,
-                    duration=3000,
+                    duration=1000,
                     parent=self
                 )
             else:
@@ -336,7 +336,7 @@ class BusinessRegistrationInterface(QWidget):
                     orient=Qt.Horizontal,
                     isClosable=True,
                     position=InfoBarPosition.TOP,
-                    duration=3000,
+                    duration=1000,
                     parent=self
                 )
         except Exception as e:
@@ -346,7 +346,7 @@ class BusinessRegistrationInterface(QWidget):
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
-                duration=5000,
+                duration=2000,
                 parent=self
             )
     
@@ -371,7 +371,7 @@ class BusinessRegistrationInterface(QWidget):
                     orient=Qt.Horizontal,
                     isClosable=True,
                     position=InfoBarPosition.TOP,
-                    duration=3000,
+                    duration=1000,
                     parent=self
                 )
             else:
@@ -387,7 +387,7 @@ class BusinessRegistrationInterface(QWidget):
                     orient=Qt.Horizontal,
                     isClosable=True,
                     position=InfoBarPosition.TOP,
-                    duration=3000,
+                    duration=1000,
                     parent=self
                 )
         except Exception as e:
@@ -397,7 +397,7 @@ class BusinessRegistrationInterface(QWidget):
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
-                duration=5000,
+                duration=2000,
                 parent=self
             )
     
@@ -457,7 +457,7 @@ class BusinessRegistrationInterface(QWidget):
                     orient=Qt.Horizontal,
                     isClosable=True,
                     position=InfoBarPosition.TOP,
-                    duration=3000,
+                    duration=1000,
                     parent=self
                 )
                 return False
@@ -471,7 +471,7 @@ class BusinessRegistrationInterface(QWidget):
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
-                duration=3000,
+                duration=1000,
                 parent=self
             )
             return False
@@ -485,7 +485,7 @@ class BusinessRegistrationInterface(QWidget):
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
-                duration=3000,
+                duration=1000,
                 parent=self
             )
             return False
@@ -513,7 +513,7 @@ class BusinessRegistrationInterface(QWidget):
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
-                duration=3000,
+                duration=1000,
                 parent=self
             )
             
@@ -526,7 +526,7 @@ class BusinessRegistrationInterface(QWidget):
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
-                duration=5000,
+                duration=2000,
                 parent=self
             )
     
@@ -554,7 +554,7 @@ class BusinessRegistrationInterface(QWidget):
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
-                duration=3000,
+                duration=1000,
                 parent=self
             )
             
@@ -567,7 +567,7 @@ class BusinessRegistrationInterface(QWidget):
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
-                duration=5000,
+                duration=2000,
                 parent=self
             )
     
@@ -596,7 +596,7 @@ class BusinessRegistrationInterface(QWidget):
                 orient=Qt.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
-                duration=3000,
+                duration=1000,
                 parent=self
             )
     
