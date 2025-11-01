@@ -43,6 +43,9 @@ class Settings:
     DEV_MODE: bool = os.getenv("DEV_MODE", "False").lower() == "true"
     DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
     
+    # 암호화 설정
+    ENCRYPTION_KEY: Optional[str] = os.getenv("ENCRYPTION_KEY", None)
+    
     @classmethod
     def get_database_path(cls) -> str:
         """

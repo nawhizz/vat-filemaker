@@ -9,6 +9,7 @@ from app.repositories.database import DatabaseInitializer
 from app.repositories.card_repository import CardRepository
 from app.repositories.schema import CardInfo
 from app.config.settings import settings
+from app.utils.crypto import encrypt_card_number, decrypt_card_number
 
 
 class CardService:
@@ -71,7 +72,12 @@ class CardService:
         raise ValueError(f"{field}은(는) 필수 입력 항목입니다.")
     
     try:
-      return self.repository.create(data)
+      # 카드번호 암호화
+      card_data = data.copy()
+      if card_data.get('card_number'):
+        card_data['card_number'] = encrypt_card_number(card_data['card_number'])
+      
+      return self.repository.create(card_data)
     except ValueError as e:
       # 제약조건 위반 등의 ValueError는 그대로 전달
       raise e
@@ -86,13 +92,25 @@ class CardService:
       card_id: 카드 정보 ID
     
     Returns:
-      카드 정보 딕셔너리 또는 None
+      카드 정보 딕셔너리 또는 None (카드번호는 복호화된 상태)
     """
     if not self.repository:
       raise RuntimeError("Repository가 초기화되지 않았습니다.")
     
     card = self.repository.get(card_id)
-    return card.to_dict() if card else None
+    if not card:
+      return None
+    
+    card_dict = card.to_dict()
+    # 카드번호 복호화
+    if card_dict.get('card_number'):
+      try:
+        card_dict['card_number'] = decrypt_card_number(card_dict['card_number'])
+      except Exception as e:
+        # 복호화 실패 시 원본 반환 (이미 암호화된 상태일 수 있음)
+        pass
+    
+    return card_dict
   
   def update_card(self, card_id: int, update_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
@@ -103,14 +121,30 @@ class CardService:
       update_data: 수정할 데이터
     
     Returns:
-      수정된 카드 정보 딕셔너리 또는 None
+      수정된 카드 정보 딕셔너리 또는 None (카드번호는 복호화된 상태)
     """
     if not self.repository:
       raise RuntimeError("Repository가 초기화되지 않았습니다.")
     
     try:
-      updated_card = self.repository.update(card_id, update_data)
-      return updated_card.to_dict() if updated_card else None
+      # 카드번호 암호화
+      update_data_encrypted = update_data.copy()
+      if update_data_encrypted.get('card_number'):
+        update_data_encrypted['card_number'] = encrypt_card_number(update_data_encrypted['card_number'])
+      
+      updated_card = self.repository.update(card_id, update_data_encrypted)
+      if not updated_card:
+        return None
+      
+      card_dict = updated_card.to_dict()
+      # 카드번호 복호화
+      if card_dict.get('card_number'):
+        try:
+          card_dict['card_number'] = decrypt_card_number(card_dict['card_number'])
+        except Exception:
+          pass
+      
+      return card_dict
     except Exception as e:
       raise RuntimeError(f"카드 정보 수정 실패: {e}")
   
@@ -137,7 +171,7 @@ class CardService:
     모든 카드 정보 목록 조회
     
     Returns:
-      카드 정보 리스트
+      카드 정보 리스트 (카드번호는 복호화된 상태)
     """
     if not self.repository:
       raise RuntimeError("Repository가 초기화되지 않았습니다.")
@@ -146,7 +180,17 @@ class CardService:
       from app.repositories.schema import CardInfo
       session = self.db_initializer.get_session()
       results = session.query(CardInfo).all()
-      return [card.to_dict() for card in results]
+      cards = []
+      for card in results:
+        card_dict = card.to_dict()
+        # 카드번호 복호화
+        if card_dict.get('card_number'):
+          try:
+            card_dict['card_number'] = decrypt_card_number(card_dict['card_number'])
+          except Exception:
+            pass
+        cards.append(card_dict)
+      return cards
     except Exception as e:
       raise RuntimeError(f"카드 정보 조회 실패: {e}")
   
@@ -195,7 +239,17 @@ class CardService:
         query = query.filter(CardInfo.is_active == is_active)
       
       results = query.all()
-      return [card.to_dict() for card in results]
+      cards = []
+      for card in results:
+        card_dict = card.to_dict()
+        # 카드번호 복호화
+        if card_dict.get('card_number'):
+          try:
+            card_dict['card_number'] = decrypt_card_number(card_dict['card_number'])
+          except Exception:
+            pass
+        cards.append(card_dict)
+      return cards
     except Exception as e:
       raise RuntimeError(f"카드 정보 검색 실패: {e}")
 
