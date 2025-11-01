@@ -16,6 +16,7 @@ from qfluentwidgets import (
     InfoBarPosition
 )
 from app.views.business_registration_view import BusinessRegistrationInterface
+from app.views.card_company_view import CardCompanyInterface
 
 
 class MainWindow(FluentWindow):
@@ -65,6 +66,16 @@ class MainWindow(FluentWindow):
             self.business_registration_interface,
             FluentIcon.PEOPLE,
             "사업장 정보 등록",
+            NavigationItemPosition.TOP
+        )
+        
+        # 카드사 정보 관리 페이지 추가
+        self.card_company_interface = CardCompanyInterface()
+        self.card_company_interface.setObjectName("card_company_interface")
+        self.addSubInterface(
+            self.card_company_interface,
+            FluentIcon.PEOPLE,
+            "카드사 정보 관리",
             NavigationItemPosition.TOP
         )
         

@@ -1,13 +1,14 @@
 """
-사업장정보 데이터 모델
+사업자정보 데이터 모델
 
-SQLAlchemy ORM을 사용하여 사업장정보 테이블을 정의합니다.
+SQLAlchemy ORM을 사용하여 사업자정보 테이블을 정의합니다.
 """
 
 from datetime import datetime
 from typing import Optional
-from sqlalchemy import Column, String, Text, DateTime, create_engine
+from sqlalchemy import Column, String, Text, DateTime, Integer, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 Base = declarative_base()
@@ -15,7 +16,7 @@ Base = declarative_base()
 
 class BusinessInfo(Base):
     """
-    사업장정보 테이블 모델
+    사업자정보 테이블 모델
     
     개인 사업자의 기본 정보를 저장하는 테이블입니다.
     """
@@ -94,6 +95,7 @@ class BusinessInfo(Base):
         onupdate=func.current_timestamp(), 
         comment='최종 수정 시간'
     )
+
     
     def __repr__(self) -> str:
         """
@@ -134,4 +136,50 @@ class BusinessInfo(Base):
             address=data.get('address'),
             phone_number=data.get('phone_number'),
             email=data.get('email')
+        )
+
+
+class CardCompanyInfo(Base):
+    """
+    카드사 정보 테이블 모델
+    
+    카드사 메타 정보를 저장합니다.
+    """
+    __tablename__ = 'card_company_info'
+
+    # 자동 생성 기본 키
+    id = Column(Integer, primary_key=True, autoincrement=True, comment='기본 키')
+
+    # 카드사 코드 및 명칭
+    card_company_code = Column(String(3), nullable=False, comment='카드사 코드')
+    card_company_name = Column(String(255), nullable=False, comment='카드사 한글명')
+    card_company_name_en = Column(String(255), comment='카드사 영문명')
+
+    # 생성/수정 시각
+    created_at = Column(DateTime, default=func.current_timestamp(), comment='생성 시간')
+    updated_at = Column(
+        DateTime,
+        default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+        comment='최종 수정 시간'
+    )
+
+    def to_dict(self) -> dict:
+        """객체를 딕셔너리로 변환합니다."""
+        return {
+            'id': self.id,
+            'card_company_code': self.card_company_code,
+            'card_company_name': self.card_company_name,
+            'card_company_name_en': self.card_company_name_en,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> 'CardCompanyInfo':
+        """딕셔너리로부터 객체를 생성합니다."""
+        return cls(
+            card_company_code=data.get('card_company_code'),
+            card_company_name=data.get('card_company_name'),
+            card_company_name_en=data.get('card_company_name_en'),
         )

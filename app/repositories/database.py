@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from app.repositories.schema import Base, BusinessInfo
+from app.repositories.schema import Base, BusinessInfo, CardCompanyInfo
 
 
 class DatabaseInitializer:
@@ -136,9 +136,15 @@ class DatabaseInitializer:
             self.create_tables()
             
             # 3. 추가 SQL 스크립트 실행 (인덱스, 트리거 등)
-            sql_file_path = Path(__file__).parent / "sql" / "business_info.sql"
-            if sql_file_path.exists():
-                self.execute_sql_file(str(sql_file_path))
+            # business_info.sql 실행
+            business_info_sql = Path(__file__).parent / "sql" / "business_info.sql"
+            if business_info_sql.exists():
+                self.execute_sql_file(str(business_info_sql))
+            
+            # card_company_info.sql 실행
+            card_company_info_sql = Path(__file__).parent / "sql" / "card_company_info.sql"
+            if card_company_info_sql.exists():
+                self.execute_sql_file(str(card_company_info_sql))
             
             print("데이터베이스 초기화가 완료되었습니다!")
             
