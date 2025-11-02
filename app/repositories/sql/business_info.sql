@@ -1,7 +1,7 @@
--- 사업장정보 테이블 생성 스크립트
+-- 사업자정보 테이블 생성 스크립트
 -- SQLite 데이터베이스용 DDL
 
--- 사업장정보 테이블 생성
+-- 사업자정보 테이블 생성
 CREATE TABLE IF NOT EXISTS business_info (
     -- 사업자등록번호 (Primary Key)
     business_number VARCHAR(10) PRIMARY KEY,
