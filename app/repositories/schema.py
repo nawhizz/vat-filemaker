@@ -246,3 +246,135 @@ class CardInfo(Base):
             card_company_id=data.get('card_company_id'),
             is_active=data.get('is_active', True),
         )
+
+
+class CommonCode(Base):
+    """
+    공통 코드 테이블 모델
+    
+    공통 코드(코드 그룹별 코드 값)를 저장합니다.
+    """
+    __tablename__ = 'common_code'
+    
+    # 복합 기본 키 (code_group, code)
+    code_group = Column(String(100), primary_key=True, comment='코드 그룹명')
+    code = Column(String(100), primary_key=True, comment='코드 값')
+    
+    # 코드명
+    code_name = Column(String(255), nullable=False, comment='코드명')
+    
+    # 코드약어명
+    code_abbr = Column(String(255), nullable=False, comment='코드약어명')
+    
+    # 정렬 순서
+    sort_order = Column(Integer, default=0, comment='정렬 순서')
+    
+    # 사용여부 (Boolean: 0 = 비활성, 1 = 활성)
+    is_active = Column(Boolean, default=True, nullable=False, comment='사용여부')
+    
+    # 비고
+    description = Column(Text, comment='비고')
+    
+    # 생성/수정 시각
+    created_at = Column(DateTime, default=func.current_timestamp(), comment='생성 시간')
+    updated_at = Column(
+        DateTime,
+        default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+        comment='최종 수정 시간'
+    )
+    
+    def to_dict(self) -> dict:
+        """객체를 딕셔너리로 변환합니다."""
+        return {
+            'code_group': self.code_group,
+            'code': self.code,
+            'code_name': self.code_name,
+            'code_abbr': self.code_abbr,
+            'sort_order': self.sort_order,
+            'is_active': bool(self.is_active) if self.is_active is not None else True,
+            'description': self.description,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
+    
+    @classmethod
+    def from_dict(cls, data: dict) -> 'CommonCode':
+        """딕셔너리로부터 객체를 생성합니다."""
+        return cls(
+            code_group=data.get('code_group'),
+            code=data.get('code'),
+            code_name=data.get('code_name'),
+            code_abbr=data.get('code_abbr'),
+            sort_order=data.get('sort_order', 0),
+            is_active=data.get('is_active', True),
+            description=data.get('description'),
+        )
+
+
+class VendorInfo(Base):
+    """
+    거래처정보 테이블 모델
+    
+    거래처 정보를 저장합니다.
+    """
+    __tablename__ = 'vendor_info'
+    
+    # 자동 생성 기본 키
+    id = Column(Integer, primary_key=True, autoincrement=True, comment='기본 키')
+    
+    # 거래처 사업자등록번호 (유니크)
+    business_number = Column(String(10), unique=True, nullable=False, comment='거래처 사업자등록번호')
+    
+    # 거래처명
+    vendor_name = Column(String(255), nullable=False, comment='거래처명')
+    
+    # 과세유형 (01:일반과세자, 02:간이과세자, 03:과세특례자, 04:면세사업자 등)
+    tax_type = Column(String(10), comment='과세유형')
+    
+    # 사업자 상태 (01:계속사업자, 02:휴업, 03:폐업 등)
+    business_status = Column(String(10), comment='사업자 상태')
+    
+    # 상태 업데이트 날짜
+    status_updated_at = Column(DateTime, comment='상태 업데이트 날짜')
+    
+    # 생성/수정 시각
+    created_at = Column(DateTime, default=func.current_timestamp(), comment='생성 시간')
+    updated_at = Column(
+        DateTime,
+        default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+        comment='최종 수정 시간'
+    )
+    
+    def to_dict(self) -> dict:
+        """객체를 딕셔너리로 변환합니다."""
+        return {
+            'id': self.id,
+            'business_number': self.business_number,
+            'vendor_name': self.vendor_name,
+            'tax_type': self.tax_type,
+            'business_status': self.business_status,
+            'status_updated_at': self.status_updated_at.isoformat() if self.status_updated_at else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
+    
+    @classmethod
+    def from_dict(cls, data: dict) -> 'VendorInfo':
+        """딕셔너리로부터 객체를 생성합니다."""
+        from datetime import datetime
+        status_updated_at = data.get('status_updated_at')
+        if isinstance(status_updated_at, str):
+            try:
+                status_updated_at = datetime.fromisoformat(status_updated_at.replace('Z', '+00:00'))
+            except:
+                status_updated_at = None
+        
+        return cls(
+            business_number=data.get('business_number'),
+            vendor_name=data.get('vendor_name'),
+            tax_type=data.get('tax_type'),
+            business_status=data.get('business_status'),
+            status_updated_at=status_updated_at,
+        )

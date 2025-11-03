@@ -215,8 +215,9 @@ class CardInterface(QWidget):
       self.search_card_company_combo.clear()
       self.search_card_company_combo.addItem("전체", userData=None)
       
-      # 등록 폼 콤보박스 초기화
+      # 등록 폼 콤보박스 초기화 및 "선택" 항목 추가
       self.card_company_combo.clear()
+      self.card_company_combo.addItem("선택", userData=None)
       
       for company in card_companies:
         company_name = company.get('card_company_name', '')
@@ -422,13 +423,19 @@ class CardInterface(QWidget):
     # 카드유형
     self.card_type_input.setText(card_data.get('card_type', ''))
     
-    # 카드사 선택
+    # 카드사 선택 (인덱스 1부터 검색, 인덱스 0은 "선택" 항목)
     card_company_id = card_data.get('card_company_id')
     if card_company_id:
-      for i in range(self.card_company_combo.count()):
+      for i in range(1, self.card_company_combo.count()):
         if self.card_company_combo.itemData(i) == card_company_id:
           self.card_company_combo.setCurrentIndex(i)
           break
+      else:
+        # 일치하는 카드사를 찾지 못한 경우 "선택"으로 설정
+        self.card_company_combo.setCurrentIndex(0)
+    else:
+      # 카드사 ID가 없는 경우 "선택"으로 설정
+      self.card_company_combo.setCurrentIndex(0)
     
     # 사용여부
     is_active = card_data.get('is_active', True)
@@ -441,8 +448,11 @@ class CardInterface(QWidget):
     Returns:
       폼 데이터 딕셔너리
     """
-    # 카드사 ID 가져오기
-    card_company_id = self.card_company_combo.currentData()
+    # 카드사 ID 가져오기 (인덱스 0이면 "선택" 항목이므로 None 반환)
+    card_company_id = None
+    current_index = self.card_company_combo.currentIndex()
+    if current_index > 0:  # "선택"이 아닌 경우
+      card_company_id = self.card_company_combo.currentData()
     
     return {
       'card_number': self.card_number_input.text().strip(),
@@ -491,6 +501,6 @@ class CardInterface(QWidget):
     self.card_number_input.clear()
     self.card_name_input.clear()
     self.card_type_input.clear()
-    self.card_company_combo.setCurrentIndex(-1)
+    self.card_company_combo.setCurrentIndex(0)  # "선택" 항목으로 설정
     self.is_active_checkbox.setChecked(True)
 

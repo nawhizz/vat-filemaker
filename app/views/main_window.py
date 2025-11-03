@@ -18,6 +18,8 @@ from qfluentwidgets import (
 from app.views.business_registration_view import BusinessRegistrationInterface
 from app.views.card_company_view import CardCompanyInterface
 from app.views.card_view import CardInterface
+from app.views.common_code_view import CommonCodeInterface
+from app.views.vendor_view import VendorInterface
 
 
 class MainWindow(FluentWindow):
@@ -33,7 +35,7 @@ class MainWindow(FluentWindow):
         # 윈도우 기본 설정
         self.setWindowTitle("부가세 도우미")
         self.setMinimumSize(1024, 768)
-        self.resize(1024, 768)  # 최초 실행시 윈도우 크기 설정
+        self.resize(1280, 800)  # 최초 실행시 윈도우 크기 설정
         
         # 네비게이션 아이템 추가
         self._init_navigation()
@@ -87,6 +89,26 @@ class MainWindow(FluentWindow):
             self.card_interface,
             FluentIcon.CHAT,
             "카드 정보 관리",
+            NavigationItemPosition.TOP
+        )
+        
+        # 공통코드 관리 페이지 추가
+        self.common_code_interface = CommonCodeInterface()
+        self.common_code_interface.setObjectName("common_code_interface")
+        self.addSubInterface(
+            self.common_code_interface,
+            FluentIcon.DEVELOPER_TOOLS,
+            "공통코드 관리",
+            NavigationItemPosition.TOP
+        )
+        
+        # 거래처정보 관리 페이지 추가
+        self.vendor_interface = VendorInterface()
+        self.vendor_interface.setObjectName("vendor_interface")
+        self.addSubInterface(
+            self.vendor_interface,
+            FluentIcon.SHOPPING_CART,
+            "거래처정보 관리",
             NavigationItemPosition.TOP
         )
         
