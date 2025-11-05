@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
   QVBoxLayout, 
   QHBoxLayout, 
   QFormLayout,
+  QGridLayout,
   QHeaderView,
   QAbstractItemView
 )
@@ -25,7 +26,8 @@ from qfluentwidgets import (
   BodyLabel,
   ComboBox,
   TableView,
-  DateEdit
+  DateEdit,
+  FluentIcon
 )
 from PySide6.QtCore import QDate
 from app.services.vendor_service import VendorService
@@ -60,31 +62,72 @@ class VendorInterface(QWidget):
     layout.setContentsMargins(30, 30, 30, 30)
     layout.setSpacing(20)
     
+    # 제목/버튼 섹션
+    title_layout = QHBoxLayout()
     # 제목
     title_label = TitleLabel("거래처정보 관리")
-    layout.addWidget(title_label)
-    
-    # 설명
-    description_label = BodyLabel("거래처정보를 등록하고 관리할 수 있습니다.")
-    layout.addWidget(description_label)
+    title_layout.addWidget(title_label)
+    title_layout.addStretch()
+    # 버튼 섹션
+    button_layout = QHBoxLayout()
+    button_layout.setSpacing(10)
+    # 조회 버튼
+    self.search_button: PushButton = PrimaryPushButton("조회", icon=FluentIcon.SEARCH)
+    self.search_button.setMinimumWidth(100)
+    self.search_button.setMaximumWidth(100)
+    button_layout.addWidget(self.search_button)
+    # 신규 버튼
+    self.new_button: PushButton = PrimaryPushButton("신규", icon=FluentIcon.ADD)
+    self.new_button.setMinimumWidth(100)
+    self.new_button.setMaximumWidth(100)
+    button_layout.addWidget(self.new_button)
+    # 저장 버튼
+    self.save_button: PushButton = PrimaryPushButton("저장", icon=FluentIcon.SAVE)
+    self.save_button.setMinimumWidth(100)
+    self.save_button.setMaximumWidth(100)
+    button_layout.addWidget(self.save_button)
+    # 삭제 버튼
+    self.delete_button: PushButton = PrimaryPushButton("삭제", icon=FluentIcon.DELETE)
+    self.delete_button.setMinimumWidth(100)
+    self.delete_button.setMaximumWidth(100)
+    button_layout.addWidget(self.delete_button)
+    # 초기화 버튼
+    self.reset_button: PushButton = PrimaryPushButton("초기화", icon=FluentIcon.ROTATE)
+    self.reset_button.setMinimumWidth(100)
+    self.reset_button.setMaximumWidth(100)
+    button_layout.addWidget(self.reset_button)
+
+    title_layout.addLayout(button_layout)
+
+    layout.addLayout(title_layout)
     
     # 검색조건 섹션
     search_card = CardWidget()
-    search_card.setFixedHeight(100)
-    search_layout = QFormLayout(search_card)
+    search_card.setFixedHeight(80)
+    search_layout = QHBoxLayout(search_card)
     search_layout.setSpacing(15)
     search_layout.setContentsMargins(20, 20, 20, 20)
     
     # 검색조건: 사업자등록번호
+    business_number_label = BodyLabel("사업자등록번호:")
+    search_layout.addWidget(business_number_label)
     self.search_business_number_input: LineEdit = LineEdit()
     self.search_business_number_input.setPlaceholderText("사업자등록번호로 검색")
-    search_layout.addRow("사업자등록번호", self.search_business_number_input)
+    # 사업자등록번호 입력 필드 기본 폭 설정
+    self.search_business_number_input.setMinimumWidth(200)
+    self.search_business_number_input.setMaximumWidth(200)
+    search_layout.addWidget(self.search_business_number_input)
     
     # 검색조건: 거래처명
+    search_layout.addSpacing(50)  # 간격 추가
+    vendor_name_label = BodyLabel("거래처명:")
+    search_layout.addWidget(vendor_name_label)
     self.search_vendor_name_input: LineEdit = LineEdit()
     self.search_vendor_name_input.setPlaceholderText("거래처명으로 검색")
-    search_layout.addRow("거래처명", self.search_vendor_name_input)
-    
+    # 사업자거래처명등록번호 입력 필드 기본 폭 설정
+    self.search_vendor_name_input.setMinimumWidth(330)
+    search_layout.addWidget(self.search_vendor_name_input)
+
     layout.addWidget(search_card)
     
     # 거래처정보 등록 섹션과 버튼 영역을 담을 수평 레이아웃
@@ -93,68 +136,74 @@ class VendorInterface(QWidget):
     
     # 거래처정보 등록 폼 카드
     form_card = CardWidget()
-    form_card.setFixedWidth(450)
-    form_layout = QFormLayout(form_card)
-    form_layout.setSpacing(15)
-    form_layout.setContentsMargins(20, 20, 20, 20)
+    form_card_layout = QGridLayout(form_card)
+    form_card_layout.setSpacing(15)
+    form_card_layout.setContentsMargins(20, 20, 20, 20)
+    form_card_layout.setSpacing(30)
+    
+    # 첫 번째 줄 (row=0): 사업자등록번호, 거래처명
+    row = 0
     
     # 사업자등록번호
+    business_number_label = BodyLabel("사업자등록번호 *")
+    form_card_layout.addWidget(business_number_label, row, 0)
     self.business_number_input: LineEdit = LineEdit()
-    self.business_number_input.setPlaceholderText("사업자등록번호를 입력하세요 (10자리)")
-    self.business_number_input.setMaxLength(10)
-    form_layout.addRow("사업자등록번호 *", self.business_number_input)
+    self.business_number_input.setPlaceholderText("사업자등록번호를 입력하세요")
+    # 자동 포맷팅을 위해 maxLength를 12로 설정 (xxx-xx-xxxxx = 12자리)
+    self.business_number_input.setMaxLength(12)
+    # 사업자등록번호 입력 필드 기본 폭 설정
+    self.business_number_input.setMinimumWidth(200)
+    self.business_number_input.setMaximumWidth(200)
+    form_card_layout.addWidget(self.business_number_input, row, 1)
     
     # 거래처명
+    # form_card_layout.setSpacing(30)  # 간격 추가
+    vendor_name_label = BodyLabel("거래처명 *")
+    form_card_layout.addWidget(vendor_name_label, row, 2)
     self.vendor_name_input: LineEdit = LineEdit()
     self.vendor_name_input.setPlaceholderText("거래처명을 입력하세요")
     self.vendor_name_input.setMaxLength(255)
-    form_layout.addRow("거래처명 *", self.vendor_name_input)
+    form_card_layout.addWidget(self.vendor_name_input, row, 3)
+    
+    # 두 번째 줄 (row=1): 과세유형, 사업자 상태, 상태 업데이트일
+    row = 1
     
     # 과세유형
+    tax_type_label = BodyLabel("과세유형")
+    form_card_layout.addWidget(tax_type_label, row, 0)
     self.tax_type_combo: ComboBox = ComboBox()
     self.tax_type_combo.setPlaceholderText("과세유형을 선택하세요")
-    form_layout.addRow("과세유형", self.tax_type_combo)
+    # 과세유형 입력 필드 기본 폭 설정
+    self.tax_type_combo.setMinimumWidth(200)
+    self.tax_type_combo.setMaximumWidth(200)
+    form_card_layout.addWidget(self.tax_type_combo, row, 1)
     
     # 사업자 상태
+    # form_card_layout.setSpacing(30)  # 간격 추가
+    business_status_label = BodyLabel("사업자 상태")
+    form_card_layout.addWidget(business_status_label, row, 2)
     self.business_status_combo: ComboBox = ComboBox()
     self.business_status_combo.setPlaceholderText("사업자 상태를 선택하세요")
-    form_layout.addRow("사업자 상태", self.business_status_combo)
+    form_card_layout.addWidget(self.business_status_combo, row, 3)
     
-    # 상태 업데이트 날짜
+    # 상태 업데이트일
+    # form_card_layout.setSpacing(30)  # 간격 추가
+    status_updated_label = BodyLabel("상태 업데이트일")
+    form_card_layout.addWidget(status_updated_label, row, 4)
     self.status_updated_at_input: DateEdit = DateEdit()
     self.status_updated_at_input.setCalendarPopup(True)
     self.status_updated_at_input.setDate(QDate.currentDate())
-    form_layout.addRow("상태 업데이트일", self.status_updated_at_input)
+    form_card_layout.addWidget(self.status_updated_at_input, row, 5)
+    
+    # 컬럼 스트레치 비율 설정
+    form_card_layout.setColumnStretch(0, 1)  # 사업자등록번호 라벨
+    form_card_layout.setColumnStretch(1, 2)  # 사업자등록번호 입력
+    form_card_layout.setColumnStretch(2, 1)  # 거래처명 라벨
+    form_card_layout.setColumnStretch(3, 2)  # 거래처명 입력
+    form_card_layout.setColumnStretch(4, 1)  # 상태 업데이트일 라벨
+    form_card_layout.setColumnStretch(5, 1)  # 상태 업데이트일 입력
     
     main_content_layout.addWidget(form_card)
-    
-    # 버튼 영역
-    button_layout = QVBoxLayout()
-    button_layout.setSpacing(15)
-    
-    # 조회 버튼
-    self.search_button: PrimaryPushButton = PrimaryPushButton("조회")
-    button_layout.addWidget(self.search_button)
-    
-    # 신규 버튼
-    self.new_button: PushButton = PushButton("신규")
-    button_layout.addWidget(self.new_button)
-    
-    # 저장 버튼
-    self.save_button: PrimaryPushButton = PrimaryPushButton("저장")
-    button_layout.addWidget(self.save_button)
-    
-    # 삭제 버튼
-    self.delete_button: PushButton = PushButton("삭제")
-    button_layout.addWidget(self.delete_button)
-    
-    # 초기화 버튼
-    self.reset_button: PushButton = PushButton("초기화")
-    button_layout.addWidget(self.reset_button)
-    
-    button_layout.addStretch()
-    main_content_layout.addLayout(button_layout)
-    main_content_layout.addStretch()
     
     layout.addLayout(main_content_layout)
     
@@ -198,12 +247,98 @@ class VendorInterface(QWidget):
     """
     시그널 연결
     """
+    # 사업자등록번호 입력 시 자동 포맷팅
+    self.search_business_number_input.textChanged.connect(self._on_search_business_number_changed)
+    self.business_number_input.textChanged.connect(self._on_business_number_changed)
+    
     # 버튼 클릭 이벤트
     self.search_button.clicked.connect(self._on_search_button_clicked)
     self.new_button.clicked.connect(self._on_new_button_clicked)
     self.save_button.clicked.connect(self._on_save_button_clicked)
     self.delete_button.clicked.connect(self._on_delete_button_clicked)
     self.reset_button.clicked.connect(self._on_reset_button_clicked)
+  
+  def _format_business_number(self, text: str) -> str:
+    """
+    사업자등록번호를 xxx-xx-xxxxx 형식으로 포맷팅
+    
+    Args:
+      text: 입력된 사업자등록번호 (하이픈 포함 또는 제외)
+    
+    Returns:
+      xxx-xx-xxxxx 형식으로 포맷팅된 사업자등록번호
+    """
+    # 하이픈 제거한 순수 숫자만 추출
+    clean_text = text.replace('-', '')
+    
+    # 숫자가 아니면 빈 문자열 반환
+    if not clean_text.isdigit():
+      return ''
+    
+    # 10자리를 초과하면 10자리로 제한
+    if len(clean_text) > 10:
+      clean_text = clean_text[:10]
+    
+    # 자동 포맷팅: xxx-xx-xxxxx
+    if len(clean_text) == 10:
+      return f"{clean_text[:3]}-{clean_text[3:5]}-{clean_text[5:]}"
+    elif len(clean_text) > 5:  # 7자리 이상: xxx-xx-xxxxx
+      return f"{clean_text[:3]}-{clean_text[3:5]}-{clean_text[5:]}"
+    elif len(clean_text) > 3:  # 4-6자리: xxx-xx
+      return f"{clean_text[:3]}-{clean_text[3:]}"
+    else:  # 3자리 이하
+      return clean_text
+  
+  def _clean_business_number(self, text: str) -> str:
+    """
+    사업자등록번호에서 하이픈을 제거한 10자리 숫자 반환
+    
+    Args:
+      text: 사업자등록번호 (하이픈 포함 가능)
+    
+    Returns:
+      하이픈이 제거된 10자리 숫자 문자열
+    """
+    # 하이픈 제거한 순수 숫자만 추출
+    clean_text = text.replace('-', '')
+    
+    # 숫자만 반환 (최대 10자리)
+    if clean_text.isdigit():
+      return clean_text[:10]
+    
+    return ''
+  
+  def _on_search_business_number_changed(self, text: str) -> None:
+    """
+    검색조건 사업자등록번호 입력 변경 시 자동 포맷 변환 (xxx-xx-xxxxx)
+    
+    Args:
+      text: 입력된 사업자등록번호
+    """
+    formatted_text = self._format_business_number(text)
+    
+    # 포맷 변환이 일어났다면 입력 필드 업데이트
+    if formatted_text != text:
+      # 시그널 연결을 일시적으로 해제하여 무한 루프 방지
+      self.search_business_number_input.textChanged.disconnect()
+      self.search_business_number_input.setText(formatted_text)
+      self.search_business_number_input.textChanged.connect(self._on_search_business_number_changed)
+  
+  def _on_business_number_changed(self, text: str) -> None:
+    """
+    등록 폼 사업자등록번호 입력 변경 시 자동 포맷 변환 (xxx-xx-xxxxx)
+    
+    Args:
+      text: 입력된 사업자등록번호
+    """
+    formatted_text = self._format_business_number(text)
+    
+    # 포맷 변환이 일어났다면 입력 필드 업데이트
+    if formatted_text != text:
+      # 시그널 연결을 일시적으로 해제하여 무한 루프 방지
+      self.business_number_input.textChanged.disconnect()
+      self.business_number_input.setText(formatted_text)
+      self.business_number_input.textChanged.connect(self._on_business_number_changed)
   
   def _load_common_codes(self) -> None:
     """
@@ -258,7 +393,10 @@ class VendorInterface(QWidget):
       # 검색 파라미터 설정
       search_params = {}
       if business_number:
-        search_params['business_number'] = business_number
+        # 사업자등록번호에서 "-"를 제거한 값으로 DB 조회
+        clean_business_number = self._clean_business_number(business_number)
+        if clean_business_number:
+          search_params['business_number'] = clean_business_number
       if vendor_name:
         search_params['vendor_name'] = vendor_name
       
@@ -476,8 +614,13 @@ class VendorInterface(QWidget):
     Args:
       vendor_data: 거래처정보 딕셔너리
     """
-    # 사업자등록번호
-    self.business_number_input.setText(vendor_data.get('business_number', ''))
+    # 사업자등록번호 (xxx-xx-xxxxx 형식으로 표시)
+    business_number = vendor_data.get('business_number', '')
+    if business_number:
+      formatted_business_number = self._format_business_number(business_number)
+      self.business_number_input.setText(formatted_business_number)
+    else:
+      self.business_number_input.clear()
     
     # 거래처명
     self.vendor_name_input.setText(vendor_data.get('vendor_name', ''))
@@ -540,8 +683,12 @@ class VendorInterface(QWidget):
     date = self.status_updated_at_input.date()
     status_updated_at = date.toPython().isoformat() if date.isValid() else None
     
+    # 사업자등록번호에서 "-"를 제거한 값으로 저장
+    business_number = self.business_number_input.text().strip()
+    clean_business_number = self._clean_business_number(business_number)
+    
     return {
-      'business_number': self.business_number_input.text().strip(),
+      'business_number': clean_business_number,
       'vendor_name': self.vendor_name_input.text().strip(),
       'tax_type': tax_type,
       'business_status': business_status,
@@ -579,7 +726,8 @@ class VendorInterface(QWidget):
     
     # 사업자등록번호 형식 검사 (10자리 숫자)
     business_number = data.get('business_number', '')
-    if len(business_number) != 10 or not business_number.isdigit():
+    clean_business_number = self._clean_business_number(business_number)
+    if len(clean_business_number) != 10 or not clean_business_number.isdigit():
       InfoBar.warning(
         title="입력 오류",
         content="사업자등록번호는 10자리 숫자여야 합니다.",

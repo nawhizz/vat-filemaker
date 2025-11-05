@@ -25,7 +25,8 @@ from qfluentwidgets import (
   BodyLabel,
   TableView,
   CheckBox,
-  SpinBox
+  SpinBox,
+  FluentIcon
 )
 from app.services.common_code_service import CommonCodeService
 from app.models.common_code_model import CommonCodeModel
@@ -62,8 +63,8 @@ class CommonCodeInterface(QWidget):
     layout.addWidget(title_label)
     
     # 설명
-    description_label = BodyLabel("공통코드를 등록하고 관리할 수 있습니다.")
-    layout.addWidget(description_label)
+    # description_label = BodyLabel("공통코드를 등록하고 관리할 수 있습니다.")
+    # layout.addWidget(description_label)
     
     # 검색조건 섹션
     search_card = CardWidget()
@@ -143,23 +144,23 @@ class CommonCodeInterface(QWidget):
     button_layout.setSpacing(15)
     
     # 조회 버튼
-    self.search_button: PrimaryPushButton = PrimaryPushButton("조회")
+    self.search_button: PrimaryPushButton = PrimaryPushButton("조회", icon=FluentIcon.SEARCH)
     button_layout.addWidget(self.search_button)
     
     # 신규 버튼
-    self.new_button: PushButton = PushButton("신규")
+    self.new_button: PushButton = PushButton("신규", icon=FluentIcon.ADD)
     button_layout.addWidget(self.new_button)
     
     # 저장 버튼
-    self.save_button: PrimaryPushButton = PrimaryPushButton("저장")
+    self.save_button: PrimaryPushButton = PrimaryPushButton("저장", icon=FluentIcon.SAVE)
     button_layout.addWidget(self.save_button)
     
     # 삭제 버튼
-    self.delete_button: PushButton = PushButton("삭제")
+    self.delete_button: PushButton = PushButton("삭제", icon=FluentIcon.DELETE)
     button_layout.addWidget(self.delete_button)
     
     # 초기화 버튼
-    self.reset_button: PushButton = PushButton("초기화")
+    self.reset_button: PushButton = PushButton("초기화", icon=FluentIcon.ROTATE)
     button_layout.addWidget(self.reset_button)
     
     button_layout.addStretch()

@@ -97,7 +97,14 @@ class VendorModel(QAbstractTableModel):
             if col == self.COL_ID:
                 return vendor.get('id', '')
             elif col == self.COL_BUSINESS_NUMBER:
-                return vendor.get('business_number', '')
+                # 사업자등록번호를 xxx-xx-xxxxx 형식으로 포맷팅
+                business_number = vendor.get('business_number', '')
+                if business_number:
+                    # 하이픈 제거한 순수 숫자
+                    clean_number = business_number.replace('-', '')
+                    if len(clean_number) == 10 and clean_number.isdigit():
+                        return f"{clean_number[:3]}-{clean_number[3:5]}-{clean_number[5:]}"
+                return business_number
             elif col == self.COL_VENDOR_NAME:
                 return vendor.get('vendor_name', '')
             elif col == self.COL_TAX_TYPE:

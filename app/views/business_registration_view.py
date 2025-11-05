@@ -17,7 +17,8 @@ from qfluentwidgets import (
     InfoBarPosition,
     CardWidget,
     TitleLabel,
-    BodyLabel
+    BodyLabel,
+    FluentIcon
 )
 from app.services.business_service import BusinessService
 
@@ -52,8 +53,8 @@ class BusinessRegistrationInterface(QWidget):
         layout.addWidget(title_label)
         
         # 설명
-        description_label = BodyLabel("사업자의 기본 정보를 입력하여 등록하세요.")
-        layout.addWidget(description_label)
+        # description_label = BodyLabel("사업자의 기본 정보를 입력하여 등록하세요.")
+        # layout.addWidget(description_label)
         
         # 입력 폼 카드
         form_card = CardWidget()
@@ -142,23 +143,23 @@ class BusinessRegistrationInterface(QWidget):
         button_layout.setSpacing(15)
         
         # 등록 버튼
-        self.register_button = PrimaryPushButton("등록")
+        self.register_button = PrimaryPushButton("등록", icon=FluentIcon.SAVE)
         self.register_button.clicked.connect(self._on_register_button_clicked)
         button_layout.addWidget(self.register_button)
         
         # 수정 버튼
-        self.update_button = PushButton("수정")
+        self.update_button = PushButton("수정", icon=FluentIcon.SAVE)
         self.update_button.clicked.connect(self._on_update_button_clicked)
         self.update_button.setVisible(False)  # 초기에는 숨김
         button_layout.addWidget(self.update_button)
         
         # 초기화 버튼
-        self.clear_button = PushButton("초기화")
+        self.clear_button = PushButton("초기화", icon=FluentIcon.ROTATE)
         self.clear_button.clicked.connect(self._on_clear_button_clicked)
         button_layout.addWidget(self.clear_button)
         
         # 조회 버튼
-        self.search_button = PushButton("조회")
+        self.search_button = PushButton("조회", icon=FluentIcon.SEARCH)
         self.search_button.clicked.connect(self._on_search_button_clicked)
         button_layout.addWidget(self.search_button)
         
