@@ -6,6 +6,7 @@ QAbstractTableModel을 상속받아 거래처정보를 테이블에 표시하기
 
 from typing import List, Dict, Any, Optional
 from PySide6.QtCore import QAbstractTableModel, Qt, QModelIndex
+from PySide6.QtGui import QFont, QFontDatabase
 
 
 class VendorModel(QAbstractTableModel):
@@ -46,7 +47,17 @@ class VendorModel(QAbstractTableModel):
         """
         super().__init__(parent)
         self._data: List[Dict[str, Any]] = []
-    
+        
+        # 폰트 설정 (맑은 고딕)
+        font_db = QFontDatabase()
+        available_fonts = font_db.families()
+        font_family = "맑은 고딕"
+        if font_family not in available_fonts:
+            font_family = "Malgun Gothic"
+            if font_family not in available_fonts:
+                font_family = QFont().family()
+        self._font = QFont(font_family)
+        self._font.setPointSize(9)
     def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
         """
         행 개수 반환
@@ -144,6 +155,10 @@ class VendorModel(QAbstractTableModel):
             else:
                 return int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         
+        elif role == Qt.ItemDataRole.FontRole:
+            # 폰트 역할 반환 (맑은 고딕)
+            return self._font
+        
         return None
     
     def headerData(
@@ -167,6 +182,10 @@ class VendorModel(QAbstractTableModel):
             if orientation == Qt.Orientation.Horizontal:
                 if 0 <= section < len(self.COLUMN_HEADERS):
                     return self.COLUMN_HEADERS[section]
+        
+        elif role == Qt.ItemDataRole.FontRole:
+            # 헤더 폰트 역할 반환 (맑은 고딕)
+            return self._font
         
         return None
     

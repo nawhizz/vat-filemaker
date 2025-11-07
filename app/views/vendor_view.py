@@ -6,6 +6,7 @@
 
 from typing import Optional, Dict, Any, List
 from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QFont, QFontDatabase
 from PySide6.QtWidgets import (
   QWidget, 
   QVBoxLayout, 
@@ -13,7 +14,9 @@ from PySide6.QtWidgets import (
   QFormLayout,
   QGridLayout,
   QHeaderView,
-  QAbstractItemView
+  QAbstractItemView,
+  QSpacerItem,
+  QSizePolicy
 )
 from qfluentwidgets import (
   PrimaryPushButton,
@@ -27,6 +30,7 @@ from qfluentwidgets import (
   ComboBox,
   TableView,
   DateEdit,
+  FastCalendarPicker,
   FluentIcon
 )
 from PySide6.QtCore import QDate
@@ -110,23 +114,29 @@ class VendorInterface(QWidget):
     
     # 검색조건: 사업자등록번호
     business_number_label = BodyLabel("사업자등록번호:")
+    business_number_label.setMinimumWidth(120)
+    business_number_label.setMaximumWidth(120)
     search_layout.addWidget(business_number_label)
     self.search_business_number_input: LineEdit = LineEdit()
     self.search_business_number_input.setPlaceholderText("사업자등록번호로 검색")
     # 사업자등록번호 입력 필드 기본 폭 설정
-    self.search_business_number_input.setMinimumWidth(200)
-    self.search_business_number_input.setMaximumWidth(200)
+    self.search_business_number_input.setMinimumWidth(220)
+    self.search_business_number_input.setMaximumWidth(220)
     search_layout.addWidget(self.search_business_number_input)
     
     # 검색조건: 거래처명
-    search_layout.addSpacing(50)  # 간격 추가
+    search_layout.addSpacing(30)  # 간격 추가
     vendor_name_label = BodyLabel("거래처명:")
+    vendor_name_label.setMinimumWidth(120)
+    vendor_name_label.setMaximumWidth(120)
     search_layout.addWidget(vendor_name_label)
     self.search_vendor_name_input: LineEdit = LineEdit()
     self.search_vendor_name_input.setPlaceholderText("거래처명으로 검색")
     # 사업자거래처명등록번호 입력 필드 기본 폭 설정
     self.search_vendor_name_input.setMinimumWidth(330)
+    self.search_vendor_name_input.setMaximumWidth(450)
     search_layout.addWidget(self.search_vendor_name_input)
+    search_layout.addStretch()
 
     layout.addWidget(search_card)
     
@@ -137,71 +147,97 @@ class VendorInterface(QWidget):
     # 거래처정보 등록 폼 카드
     form_card = CardWidget()
     form_card_layout = QGridLayout(form_card)
-    form_card_layout.setSpacing(15)
     form_card_layout.setContentsMargins(20, 20, 20, 20)
-    form_card_layout.setSpacing(30)
+    form_card_layout.setHorizontalSpacing(20)  # 컬럼 간 가로 간격 고정
+    form_card_layout.setVerticalSpacing(10)  # 행 간격
+    form_card_layout.setColumnMinimumWidth(2, 20)  # 두 번째 열(빈 칸) 간격 고정
+    form_card_layout.setColumnMinimumWidth(5, 20)  # 다섯 번째 열(빈 칸) 간격 고정
     
     # 첫 번째 줄 (row=0): 사업자등록번호, 거래처명
     row = 0
     
     # 사업자등록번호
     business_number_label = BodyLabel("사업자등록번호 *")
+    business_number_label.setMinimumWidth(120)
+    business_number_label.setMaximumWidth(120)
     form_card_layout.addWidget(business_number_label, row, 0)
     self.business_number_input: LineEdit = LineEdit()
     self.business_number_input.setPlaceholderText("사업자등록번호를 입력하세요")
     # 자동 포맷팅을 위해 maxLength를 12로 설정 (xxx-xx-xxxxx = 12자리)
     self.business_number_input.setMaxLength(12)
     # 사업자등록번호 입력 필드 기본 폭 설정
-    self.business_number_input.setMinimumWidth(200)
-    self.business_number_input.setMaximumWidth(200)
+    self.business_number_input.setMinimumWidth(220)
+    self.business_number_input.setMaximumWidth(220)
     form_card_layout.addWidget(self.business_number_input, row, 1)
+    
+    # 빈 칸 추가
+    form_card_layout.addItem(QSpacerItem(5, 10, QSizePolicy.Minimum, QSizePolicy.Fixed), row, 2)
     
     # 거래처명
     # form_card_layout.setSpacing(30)  # 간격 추가
     vendor_name_label = BodyLabel("거래처명 *")
-    form_card_layout.addWidget(vendor_name_label, row, 2)
+    vendor_name_label.setMinimumWidth(120)
+    vendor_name_label.setMaximumWidth(120)
+    form_card_layout.addWidget(vendor_name_label, row, 3)
     self.vendor_name_input: LineEdit = LineEdit()
     self.vendor_name_input.setPlaceholderText("거래처명을 입력하세요")
     self.vendor_name_input.setMaxLength(255)
-    form_card_layout.addWidget(self.vendor_name_input, row, 3)
+    form_card_layout.addWidget(self.vendor_name_input, row, 4, 1, 3)  # 4번 열부터 3개 열 차지 (4, 5, 6)
     
     # 두 번째 줄 (row=1): 과세유형, 사업자 상태, 상태 업데이트일
     row = 1
     
     # 과세유형
     tax_type_label = BodyLabel("과세유형")
+    tax_type_label.setMinimumWidth(120)
+    tax_type_label.setMaximumWidth(120)
     form_card_layout.addWidget(tax_type_label, row, 0)
     self.tax_type_combo: ComboBox = ComboBox()
     self.tax_type_combo.setPlaceholderText("과세유형을 선택하세요")
     # 과세유형 입력 필드 기본 폭 설정
-    self.tax_type_combo.setMinimumWidth(200)
-    self.tax_type_combo.setMaximumWidth(200)
+    self.tax_type_combo.setMinimumWidth(220)
+    self.tax_type_combo.setMaximumWidth(220)
     form_card_layout.addWidget(self.tax_type_combo, row, 1)
+    
+    # 빈 칸 추가
+    form_card_layout.addItem(QSpacerItem(5, 10, QSizePolicy.Minimum, QSizePolicy.Fixed), row, 2)
     
     # 사업자 상태
     # form_card_layout.setSpacing(30)  # 간격 추가
     business_status_label = BodyLabel("사업자 상태")
-    form_card_layout.addWidget(business_status_label, row, 2)
+    business_status_label.setMinimumWidth(120)
+    business_status_label.setMaximumWidth(120)
+    form_card_layout.addWidget(business_status_label, row, 3)
     self.business_status_combo: ComboBox = ComboBox()
     self.business_status_combo.setPlaceholderText("사업자 상태를 선택하세요")
-    form_card_layout.addWidget(self.business_status_combo, row, 3)
+    # 사업자 상태 입력 필드 기본 폭 설정
+    self.business_status_combo.setMinimumWidth(220)
+    self.business_status_combo.setMaximumWidth(220)
+    form_card_layout.addWidget(self.business_status_combo, row, 4)
+    
+    # 빈 칸 추가
+    form_card_layout.addItem(QSpacerItem(5, 10, QSizePolicy.Minimum, QSizePolicy.Fixed), row, 5)
     
     # 상태 업데이트일
     # form_card_layout.setSpacing(30)  # 간격 추가
     status_updated_label = BodyLabel("상태 업데이트일")
-    form_card_layout.addWidget(status_updated_label, row, 4)
-    self.status_updated_at_input: DateEdit = DateEdit()
-    self.status_updated_at_input.setCalendarPopup(True)
-    self.status_updated_at_input.setDate(QDate.currentDate())
-    form_card_layout.addWidget(self.status_updated_at_input, row, 5)
+    status_updated_label.setMinimumWidth(120)
+    status_updated_label.setMaximumWidth(120)
+    form_card_layout.addWidget(status_updated_label, row, 6)
+    # FastCalendarPicker: 빠른 캘린더 선택 위젯
+    self.status_updated_at_input: FastCalendarPicker = FastCalendarPicker()
+    self.status_updated_at_input.setDate(QDate.currentDate())  # 현재 날짜로 초기화
+    form_card_layout.addWidget(self.status_updated_at_input, row, 7)
     
     # 컬럼 스트레치 비율 설정
-    form_card_layout.setColumnStretch(0, 1)  # 사업자등록번호 라벨
-    form_card_layout.setColumnStretch(1, 2)  # 사업자등록번호 입력
-    form_card_layout.setColumnStretch(2, 1)  # 거래처명 라벨
-    form_card_layout.setColumnStretch(3, 2)  # 거래처명 입력
-    form_card_layout.setColumnStretch(4, 1)  # 상태 업데이트일 라벨
-    form_card_layout.setColumnStretch(5, 1)  # 상태 업데이트일 입력
+    form_card_layout.setColumnStretch(0, 0)  # 사업자등록번호 라벨 (고정)
+    form_card_layout.setColumnStretch(1, 0)  # 사업자등록번호 입력 (고정)
+    form_card_layout.setColumnStretch(2, 0)  # 빈 칸 (고정 너비)
+    form_card_layout.setColumnStretch(3, 0)  # 거래처명 라벨 (고정)
+    form_card_layout.setColumnStretch(4, 1)  # 거래처명 입력 (확장)
+    form_card_layout.setColumnStretch(5, 0)  # 빈 칸 (고정 너비)
+    form_card_layout.setColumnStretch(6, 0)  # 상태 업데이트일 라벨 (고정)
+    form_card_layout.setColumnStretch(7, 0)  # 상태 업데이트일 입력 (고정)
     
     main_content_layout.addWidget(form_card)
     
@@ -225,12 +261,38 @@ class VendorInterface(QWidget):
     self.vendor_table_view.setAlternatingRowColors(True)
     self.vendor_table_view.setSortingEnabled(True)
     
+    # 테이블 뷰 폰트 설정 (맑은 고딕)
+    font_db = QFontDatabase()
+    available_fonts = font_db.families()
+    font_family = "맑은 고딕"
+    if font_family not in available_fonts:
+        font_family = "Malgun Gothic"
+        if font_family not in available_fonts:
+            font_family = QFont().family()
+    table_font = QFont(font_family)
+    table_font.setPointSize(9)
+    self.vendor_table_view.setFont(table_font)
+    # 헤더 폰트도 설정
+    header = self.vendor_table_view.horizontalHeader()
+    header.setFont(table_font)
+    
+    # 스타일시트를 통한 폰트 강제 적용 (FluentWidgets TableView용)
+    self.vendor_table_view.setStyleSheet(f"""
+        QTableView {{
+            font-family: "{font_family}", "Malgun Gothic", "맑은 고딕", sans-serif;
+            font-size: 9pt;
+        }}
+        QHeaderView::section {{
+            font-family: "{font_family}", "Malgun Gothic", "맑은 고딕", sans-serif;
+            font-size: 9pt;
+        }}
+    """)
+    
     # 테이블 모델 설정
     self.vendor_model = VendorModel(self)
     self.vendor_table_view.setModel(self.vendor_model)
     
     # 컬럼 너비 자동 조절
-    header = self.vendor_table_view.horizontalHeader()
     header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
     
     list_layout.addWidget(self.vendor_table_view)

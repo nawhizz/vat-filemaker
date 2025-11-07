@@ -148,18 +148,18 @@ class BusinessRegistrationInterface(QWidget):
         button_layout.addWidget(self.register_button)
         
         # 수정 버튼
-        self.update_button = PushButton("수정", icon=FluentIcon.SAVE)
+        self.update_button = PrimaryPushButton("수정", icon=FluentIcon.SAVE)
         self.update_button.clicked.connect(self._on_update_button_clicked)
         self.update_button.setVisible(False)  # 초기에는 숨김
         button_layout.addWidget(self.update_button)
         
         # 초기화 버튼
-        self.clear_button = PushButton("초기화", icon=FluentIcon.ROTATE)
+        self.clear_button = PrimaryPushButton("초기화", icon=FluentIcon.ROTATE)
         self.clear_button.clicked.connect(self._on_clear_button_clicked)
         button_layout.addWidget(self.clear_button)
         
         # 조회 버튼
-        self.search_button = PushButton("조회", icon=FluentIcon.SEARCH)
+        self.search_button = PrimaryPushButton("조회", icon=FluentIcon.SEARCH)
         self.search_button.clicked.connect(self._on_search_button_clicked)
         button_layout.addWidget(self.search_button)
         

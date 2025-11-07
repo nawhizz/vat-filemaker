@@ -119,7 +119,7 @@ class CardCompanyInterface(QWidget):
     button_layout.addWidget(self.search_button)
     
     # 신규 버튼
-    self.new_button: PushButton = PushButton("신규", icon=FluentIcon.ADD)
+    self.new_button: PushButton = PrimaryPushButton("신규", icon=FluentIcon.ADD)
     button_layout.addWidget(self.new_button)
     
     # 저장 버튼
@@ -127,7 +127,7 @@ class CardCompanyInterface(QWidget):
     button_layout.addWidget(self.save_button)
     
     # 초기화 버튼
-    self.reset_button: PushButton = PushButton("초기화", icon=FluentIcon.ROTATE)
+    self.reset_button: PushButton = PrimaryPushButton("초기화", icon=FluentIcon.ROTATE)
     button_layout.addWidget(self.reset_button)
     
     button_layout.addStretch()

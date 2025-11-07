@@ -148,7 +148,7 @@ class CommonCodeInterface(QWidget):
     button_layout.addWidget(self.search_button)
     
     # 신규 버튼
-    self.new_button: PushButton = PushButton("신규", icon=FluentIcon.ADD)
+    self.new_button: PushButton = PrimaryPushButton("신규", icon=FluentIcon.ADD)
     button_layout.addWidget(self.new_button)
     
     # 저장 버튼
@@ -156,11 +156,11 @@ class CommonCodeInterface(QWidget):
     button_layout.addWidget(self.save_button)
     
     # 삭제 버튼
-    self.delete_button: PushButton = PushButton("삭제", icon=FluentIcon.DELETE)
+    self.delete_button: PushButton = PrimaryPushButton("삭제", icon=FluentIcon.DELETE)
     button_layout.addWidget(self.delete_button)
     
     # 초기화 버튼
-    self.reset_button: PushButton = PushButton("초기화", icon=FluentIcon.ROTATE)
+    self.reset_button: PushButton = PrimaryPushButton("초기화", icon=FluentIcon.ROTATE)
     button_layout.addWidget(self.reset_button)
     
     button_layout.addStretch()
