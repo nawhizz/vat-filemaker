@@ -6,7 +6,6 @@
 
 from typing import Optional, Dict, Any, List
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QFont, QFontDatabase
 from PySide6.QtWidgets import (
   QWidget, 
   QVBoxLayout, 
@@ -37,6 +36,7 @@ from PySide6.QtCore import QDate
 from app.services.vendor_service import VendorService
 from app.services.common_code_service import CommonCodeService
 from app.models.vendor_model import VendorModel
+from app.utils.font import get_app_font, get_table_font_stylesheet
 
 
 class VendorInterface(QWidget):
@@ -227,6 +227,8 @@ class VendorInterface(QWidget):
     # FastCalendarPicker: 빠른 캘린더 선택 위젯
     self.status_updated_at_input: FastCalendarPicker = FastCalendarPicker()
     self.status_updated_at_input.setDate(QDate.currentDate())  # 현재 날짜로 초기화
+    self.status_updated_at_input.setMinimumWidth(150)
+    self.status_updated_at_input.setMaximumWidth(150)
     form_card_layout.addWidget(self.status_updated_at_input, row, 7)
     
     # 컬럼 스트레치 비율 설정
@@ -238,6 +240,9 @@ class VendorInterface(QWidget):
     form_card_layout.setColumnStretch(5, 0)  # 빈 칸 (고정 너비)
     form_card_layout.setColumnStretch(6, 0)  # 상태 업데이트일 라벨 (고정)
     form_card_layout.setColumnStretch(7, 0)  # 상태 업데이트일 입력 (고정)
+
+    # 오른쪽 여백 추가 (확장 가능한 공간)
+    form_card_layout.setColumnStretch(8, 1)  # 나머지 공간 차지
     
     main_content_layout.addWidget(form_card)
     
@@ -262,31 +267,13 @@ class VendorInterface(QWidget):
     self.vendor_table_view.setSortingEnabled(True)
     
     # 테이블 뷰 폰트 설정 (맑은 고딕)
-    font_db = QFontDatabase()
-    available_fonts = font_db.families()
-    font_family = "맑은 고딕"
-    if font_family not in available_fonts:
-        font_family = "Malgun Gothic"
-        if font_family not in available_fonts:
-            font_family = QFont().family()
-    table_font = QFont(font_family)
-    table_font.setPointSize(9)
+    table_font = get_app_font()
     self.vendor_table_view.setFont(table_font)
     # 헤더 폰트도 설정
     header = self.vendor_table_view.horizontalHeader()
     header.setFont(table_font)
-    
     # 스타일시트를 통한 폰트 강제 적용 (FluentWidgets TableView용)
-    self.vendor_table_view.setStyleSheet(f"""
-        QTableView {{
-            font-family: "{font_family}", "Malgun Gothic", "맑은 고딕", sans-serif;
-            font-size: 9pt;
-        }}
-        QHeaderView::section {{
-            font-family: "{font_family}", "Malgun Gothic", "맑은 고딕", sans-serif;
-            font-size: 9pt;
-        }}
-    """)
+    self.vendor_table_view.setStyleSheet(get_table_font_stylesheet())
     
     # 테이블 모델 설정
     self.vendor_model = VendorModel(self)

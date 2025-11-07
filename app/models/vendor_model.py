@@ -6,7 +6,7 @@ QAbstractTableModel을 상속받아 거래처정보를 테이블에 표시하기
 
 from typing import List, Dict, Any, Optional
 from PySide6.QtCore import QAbstractTableModel, Qt, QModelIndex
-from PySide6.QtGui import QFont, QFontDatabase
+from app.utils.font import get_app_font
 
 
 class VendorModel(QAbstractTableModel):
@@ -49,15 +49,7 @@ class VendorModel(QAbstractTableModel):
         self._data: List[Dict[str, Any]] = []
         
         # 폰트 설정 (맑은 고딕)
-        font_db = QFontDatabase()
-        available_fonts = font_db.families()
-        font_family = "맑은 고딕"
-        if font_family not in available_fonts:
-            font_family = "Malgun Gothic"
-            if font_family not in available_fonts:
-                font_family = QFont().family()
-        self._font = QFont(font_family)
-        self._font.setPointSize(9)
+        self._font = get_app_font()
     def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
         """
         행 개수 반환
