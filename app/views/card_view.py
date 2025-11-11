@@ -31,6 +31,7 @@ from qfluentwidgets import (
 from app.services.card_service import CardService
 from app.services.card_company_service import CardCompanyService
 from app.models.card_model import CardModel
+from app.utils.crypto import format_card_number, clean_card_number, get_card_type_and_max_length
 
 
 class CardInterface(QWidget):
@@ -210,6 +211,9 @@ class CardInterface(QWidget):
     self.new_button.clicked.connect(self._on_new_button_clicked)
     self.save_button.clicked.connect(self._on_save_button_clicked)
     self.reset_button.clicked.connect(self._on_reset_button_clicked)
+    
+    # 카드번호 입력 시 자동 포맷팅
+    self.card_number_input.textChanged.connect(self._on_card_number_changed)
   
   def _load_card_companies(self) -> None:
     """
@@ -246,6 +250,56 @@ class CardInterface(QWidget):
         duration=1000,
         parent=self
       )
+  
+  def _on_card_number_changed(self) -> None:
+    """
+    카드번호 입력 변경 이벤트 처리
+    
+    입력된 카드번호를 자동으로 포맷팅하고, 카드사별 최대 자리수를 제한합니다.
+    - 아멕스(34, 37): 최대 15자리
+    - 다이너스클럽(36): 최대 14자리
+    - 일반카드: 최대 16자리
+    """
+    # 시그널 일시 차단 (무한 루프 방지)
+    self.card_number_input.blockSignals(True)
+    
+    # 현재 입력값과 커서 위치 가져오기
+    current_text = self.card_number_input.text()
+    cursor_position = self.card_number_input.cursorPosition()
+    
+    # 숫자만 추출
+    clean_number = clean_card_number(current_text)
+    
+    # 카드 유형과 최대 자리수 확인
+    card_type, max_length = get_card_type_and_max_length(clean_number)
+    
+    # 카드사별 최대 자리수만큼만 허용
+    if len(clean_number) > max_length:
+      clean_number = clean_number[:max_length]
+    
+    # 포맷팅 적용
+    formatted_text = format_card_number(clean_number)
+    
+    # 텍스트가 변경된 경우에만 업데이트
+    if current_text != formatted_text:
+      # 이전 텍스트에서 하이픈 개수 세기
+      hyphens_before_cursor = current_text[:cursor_position].count('-')
+      
+      # 포맷팅된 텍스트 설정
+      self.card_number_input.setText(formatted_text)
+      
+      # 새로운 커서 위치 계산 (하이픈이 추가된 경우 고려)
+      hyphens_after_cursor = formatted_text[:cursor_position].count('-')
+      new_cursor_position = cursor_position + (hyphens_after_cursor - hyphens_before_cursor)
+      
+      # 커서 위치가 범위를 벗어나지 않도록 조정
+      new_cursor_position = max(0, min(new_cursor_position, len(formatted_text)))
+      
+      # 커서 위치 복원
+      self.card_number_input.setCursorPosition(new_cursor_position)
+    
+    # 시그널 차단 해제
+    self.card_number_input.blockSignals(False)
   
   def _on_search_button_clicked(self) -> None:
     """
@@ -422,8 +476,10 @@ class CardInterface(QWidget):
     Args:
       card_data: 카드 정보 딕셔너리
     """
-    # 카드번호
-    self.card_number_input.setText(card_data.get('card_number', ''))
+    # 카드번호 (포맷팅 적용)
+    card_number = card_data.get('card_number', '')
+    formatted_card_number = format_card_number(card_number)
+    self.card_number_input.setText(formatted_card_number)
     
     # 마스킹 카드번호
     self.masked_card_number_input.setText(card_data.get('masked_card_number', ''))
@@ -465,8 +521,12 @@ class CardInterface(QWidget):
     if current_index > 0:  # "선택"이 아닌 경우
       card_company_id = self.card_company_combo.currentData()
     
+    # 카드번호는 하이픈을 제거한 숫자만 저장
+    card_number_text = self.card_number_input.text().strip()
+    clean_number = clean_card_number(card_number_text)
+    
     return {
-      'card_number': self.card_number_input.text().strip(),
+      'card_number': clean_number,
       'masked_card_number': self.masked_card_number_input.text().strip(),
       'card_name': self.card_name_input.text().strip(),
       'card_type': self.card_type_input.text().strip(),

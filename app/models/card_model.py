@@ -6,6 +6,7 @@ QAbstractTableModel을 상속받아 카드 정보를 테이블에 표시하기 �
 
 from typing import List, Dict, Any, Optional
 from PySide6.QtCore import QAbstractTableModel, Qt, QModelIndex
+from app.utils.crypto import format_card_number
 
 
 class CardModel(QAbstractTableModel):
@@ -99,7 +100,9 @@ class CardModel(QAbstractTableModel):
       if col == self.COL_ID:
         return card.get('id', '')
       elif col == self.COL_CARD_NUMBER:
-        return card.get('card_number', '')
+        # 카드번호를 포맷팅해서 표시 (xxxx-xxxx-xxxx-xxxx 형식)
+        card_number = card.get('card_number', '')
+        return format_card_number(card_number)
       elif col == self.COL_MASKED_CARD_NUMBER:
         return card.get('masked_card_number', '')
       elif col == self.COL_CARD_NAME:
