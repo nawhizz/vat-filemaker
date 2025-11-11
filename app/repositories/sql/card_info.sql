@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS card_info (
     -- 카드번호 (암호화된 값 저장)
     card_number VARCHAR(255) NOT NULL,
     
+    -- 카드번호 (마스킹된 값 저장, 사용자 입력)
+    masked_card_number VARCHAR(50),
+    
     -- 카드명
     card_name VARCHAR(255) NOT NULL,
     

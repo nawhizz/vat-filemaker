@@ -109,6 +109,12 @@ class CardInterface(QWidget):
     self.card_number_input.setPlaceholderText("카드번호를 입력하세요")
     form_layout.addRow("카드번호 *", self.card_number_input)
     
+    # 마스킹된 카드번호 (사용자 입력)
+    self.masked_card_number_input: LineEdit = LineEdit()
+    self.masked_card_number_input.setPlaceholderText("마스킹된 카드번호를 입력하세요 (예: 1234-****-****-5678)")
+    self.masked_card_number_input.setMaxLength(50)
+    form_layout.addRow("마스킹 카드번호 *", self.masked_card_number_input)
+    
     # 카드명
     self.card_name_input: LineEdit = LineEdit()
     self.card_name_input.setPlaceholderText("카드명을 입력하세요")
@@ -311,6 +317,7 @@ class CardInterface(QWidget):
     try:
       card_data = {
         'card_number': data['card_number'],
+        'masked_card_number': data['masked_card_number'],
         'card_name': data['card_name'],
         'card_type': data.get('card_type', '') or None,
         'card_company_id': data['card_company_id'],
@@ -418,6 +425,9 @@ class CardInterface(QWidget):
     # 카드번호
     self.card_number_input.setText(card_data.get('card_number', ''))
     
+    # 마스킹 카드번호
+    self.masked_card_number_input.setText(card_data.get('masked_card_number', ''))
+    
     # 카드명
     self.card_name_input.setText(card_data.get('card_name', ''))
     
@@ -457,6 +467,7 @@ class CardInterface(QWidget):
     
     return {
       'card_number': self.card_number_input.text().strip(),
+      'masked_card_number': self.masked_card_number_input.text().strip(),
       'card_name': self.card_name_input.text().strip(),
       'card_type': self.card_type_input.text().strip(),
       'card_company_id': card_company_id,
@@ -476,6 +487,7 @@ class CardInterface(QWidget):
     # 필수 필드 검사
     required_fields = {
       'card_number': '카드번호',
+      'masked_card_number': '마스킹 카드번호',
       'card_name': '카드명',
       'card_company_id': '카드사'
     }
@@ -500,6 +512,7 @@ class CardInterface(QWidget):
     폼 초기화
     """
     self.card_number_input.clear()
+    self.masked_card_number_input.clear()
     self.card_name_input.clear()
     self.card_type_input.clear()
     self.card_company_combo.setCurrentIndex(0)  # "선택" 항목으로 설정

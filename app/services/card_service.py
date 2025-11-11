@@ -77,6 +77,11 @@ class CardService:
       if card_data.get('card_number'):
         card_data['card_number'] = encrypt_card_number(card_data['card_number'])
       
+      # 마스킹된 카드번호 정리 (빈 문자열이면 None)
+      if 'masked_card_number' in card_data:
+        masked_value = card_data.get('masked_card_number') or None
+        card_data['masked_card_number'] = masked_value
+      
       return self.repository.create(card_data)
     except ValueError as e:
       # 제약조건 위반 등의 ValueError는 그대로 전달
@@ -131,6 +136,11 @@ class CardService:
       update_data_encrypted = update_data.copy()
       if update_data_encrypted.get('card_number'):
         update_data_encrypted['card_number'] = encrypt_card_number(update_data_encrypted['card_number'])
+      
+      # 마스킹된 카드번호 정리 (필드가 존재할 경우)
+      if 'masked_card_number' in update_data_encrypted:
+        masked_value = update_data_encrypted.get('masked_card_number') or None
+        update_data_encrypted['masked_card_number'] = masked_value
       
       updated_card = self.repository.update(card_id, update_data_encrypted)
       if not updated_card:

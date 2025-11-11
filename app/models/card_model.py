@@ -19,6 +19,7 @@ class CardModel(QAbstractTableModel):
   COLUMN_HEADERS = [
     "ID",
     "카드번호",
+    "마스킹 카드번호",
     "카드명",
     "카드유형",
     "카드사 ID",
@@ -30,12 +31,13 @@ class CardModel(QAbstractTableModel):
   # 컬럼 인덱스 상수
   COL_ID = 0
   COL_CARD_NUMBER = 1
-  COL_CARD_NAME = 2
-  COL_CARD_TYPE = 3
-  COL_CARD_COMPANY_ID = 4
-  COL_IS_ACTIVE = 5
-  COL_CREATED_AT = 6
-  COL_UPDATED_AT = 7
+  COL_MASKED_CARD_NUMBER = 2
+  COL_CARD_NAME = 3
+  COL_CARD_TYPE = 4
+  COL_CARD_COMPANY_ID = 5
+  COL_IS_ACTIVE = 6
+  COL_CREATED_AT = 7
+  COL_UPDATED_AT = 8
   
   def __init__(self, parent=None):
     """
@@ -98,6 +100,8 @@ class CardModel(QAbstractTableModel):
         return card.get('id', '')
       elif col == self.COL_CARD_NUMBER:
         return card.get('card_number', '')
+      elif col == self.COL_MASKED_CARD_NUMBER:
+        return card.get('masked_card_number', '')
       elif col == self.COL_CARD_NAME:
         return card.get('card_name', '')
       elif col == self.COL_CARD_TYPE:

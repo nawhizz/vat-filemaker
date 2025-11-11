@@ -198,6 +198,9 @@ class CardInfo(Base):
 
     # 카드번호 (암호화된 값 저장)
     card_number = Column(String(255), nullable=False, comment='카드번호(암호화)')
+    
+    # 카드번호 (마스킹된 값 저장, 사용자 입력)
+    masked_card_number = Column(String(50), nullable=True, comment='카드번호(마스킹)')
 
     # 카드명
     card_name = Column(String(255), nullable=False, comment='카드명')
@@ -228,6 +231,7 @@ class CardInfo(Base):
         return {
             'id': self.id,
             'card_number': self.card_number,
+            'masked_card_number': self.masked_card_number,
             'card_name': self.card_name,
             'card_type': self.card_type,
             'card_company_id': self.card_company_id,
@@ -241,6 +245,7 @@ class CardInfo(Base):
         """딕셔너리로부터 객체를 생성합니다."""
         return cls(
             card_number=data.get('card_number'),
+            masked_card_number=data.get('masked_card_number'),
             card_name=data.get('card_name'),
             card_type=data.get('card_type'),
             card_company_id=data.get('card_company_id'),
