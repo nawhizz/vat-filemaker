@@ -79,6 +79,24 @@ vendor_info
 └── updated_at: DateTime       		   # 최종 수정 시간
 ```
 
+### 6. 카드 사용 내역 (CardTransaction)
+```
+card_transaction
+├── id: Integer (PK)           # 자동 생성 기본 키
+├── card_company_id (FK)       # 카드사 ID (외래 키)
+├── transaction_date: DateTime # 거래 일자
+├── masked_card_number: String # 카드번호(마스킹)
+├── is_cancel: Boolean         # 거래취소여부
+├── amount: Decimal            # 거래 금액
+├── vendor_name: String        # 거래처명
+├── business_number: String    # 사업자등록번호
+├── approval_number: String    # 승인번호
+├── card_id: Integer (FK)      # 카드 ID (외래 키)
+├── vendor_id: Integer (FK)    # 거래처 ID (외래 키)
+├── created_at: DateTime       # 생성 시간
+└── updated_at: DateTime       # 최종 수정 시간
+```
+
 
 - [카드사 금융결제원 표준 코드](https://faq.portone.io/53589280-bbc9-4fab-938d-93257d452216)
 - [국세청_사업자등록정보 진위확인 및 상태조회 서비스](https://www.data.go.kr/data/15081808/openapi.do)

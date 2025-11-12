@@ -165,7 +165,19 @@ vendor_info
 
 **Cursor**
 ```
-@vendor_info.sql @ccard_company_service.py 
+@vendor_info.sql @card_company_service.py 
 카드사정보 테이블을 참조해서, 거래처정보 테이블에 대한 DB 처리를 추가해줘.
 tax_type, business_status 컬럼의 코드에 대한 코드명은 common_code 테이블에서 가져올수 있어.
+```
+
+```
+카드정보 등록/조회시 사용하는 카드번호의 형식은 다음과 같어.
+입력, 조회시 해당 카드 형식을 적용해줘.
+
+**카드번호로 카드번호 형식 구분 방법**
+| 카드사        | 카드번호 자리수 | 형식                | 시작 번호(BIN)         |
+|--------------|----------------|--------------------|----------------------|
+| 아멕스       | 15자리         | xxxx-xxxxxx-xxxxx   | 34, 37               |
+| 다이너스클럽 | 14자리         | xxxx-xxxxxx-xxxx    | 36, 3616 등          |
+| 일반카드     | 16자리         | xxxx-xxxx-xxxx-xxxx | 4(비자), 5(마스터) 등 |
 ```

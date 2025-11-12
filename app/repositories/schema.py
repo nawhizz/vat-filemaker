@@ -6,12 +6,76 @@ SQLAlchemy ORM을 사용하여 사업자정보 테이블을 정의합니다.
 
 from datetime import datetime
 from typing import Optional
-from sqlalchemy import Column, String, Text, DateTime, Integer, ForeignKey, Boolean
+from sqlalchemy import Column, String, Text, DateTime, Integer, ForeignKey, Boolean, Numeric
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 Base = declarative_base()
+
+
+class CommonCode(Base):
+    """
+    공통 코드 테이블 모델
+    
+    공통 코드(코드 그룹별 코드 값)를 저장합니다.
+    """
+    __tablename__ = 'common_code'
+    
+    # 복합 기본 키 (code_group, code)
+    code_group = Column(String(100), primary_key=True, comment='코드 그룹명')
+    code = Column(String(100), primary_key=True, comment='코드 값')
+    
+    # 코드명
+    code_name = Column(String(255), nullable=False, comment='코드명')
+    
+    # 코드약어명
+    code_abbr = Column(String(255), nullable=False, comment='코드약어명')
+    
+    # 정렬 순서
+    sort_order = Column(Integer, default=0, comment='정렬 순서')
+    
+    # 사용여부 (Boolean: 0 = 비활성, 1 = 활성)
+    is_active = Column(Boolean, default=True, nullable=False, comment='사용여부')
+    
+    # 비고
+    description = Column(Text, comment='비고')
+    
+    # 생성/수정 시각
+    created_at = Column(DateTime, default=func.current_timestamp(), comment='생성 시간')
+    updated_at = Column(
+        DateTime,
+        default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+        comment='최종 수정 시간'
+    )
+    
+    def to_dict(self) -> dict:
+        """객체를 딕셔너리로 변환합니다."""
+        return {
+            'code_group': self.code_group,
+            'code': self.code,
+            'code_name': self.code_name,
+            'code_abbr': self.code_abbr,
+            'sort_order': self.sort_order,
+            'is_active': bool(self.is_active) if self.is_active is not None else True,
+            'description': self.description,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
+    
+    @classmethod
+    def from_dict(cls, data: dict) -> 'CommonCode':
+        """딕셔너리로부터 객체를 생성합니다."""
+        return cls(
+            code_group=data.get('code_group'),
+            code=data.get('code'),
+            code_name=data.get('code_name'),
+            code_abbr=data.get('code_abbr'),
+            sort_order=data.get('sort_order', 0),
+            is_active=data.get('is_active', True),
+            description=data.get('description'),
+        )
 
 
 class BusinessInfo(Base):
@@ -253,70 +317,6 @@ class CardInfo(Base):
         )
 
 
-class CommonCode(Base):
-    """
-    공통 코드 테이블 모델
-    
-    공통 코드(코드 그룹별 코드 값)를 저장합니다.
-    """
-    __tablename__ = 'common_code'
-    
-    # 복합 기본 키 (code_group, code)
-    code_group = Column(String(100), primary_key=True, comment='코드 그룹명')
-    code = Column(String(100), primary_key=True, comment='코드 값')
-    
-    # 코드명
-    code_name = Column(String(255), nullable=False, comment='코드명')
-    
-    # 코드약어명
-    code_abbr = Column(String(255), nullable=False, comment='코드약어명')
-    
-    # 정렬 순서
-    sort_order = Column(Integer, default=0, comment='정렬 순서')
-    
-    # 사용여부 (Boolean: 0 = 비활성, 1 = 활성)
-    is_active = Column(Boolean, default=True, nullable=False, comment='사용여부')
-    
-    # 비고
-    description = Column(Text, comment='비고')
-    
-    # 생성/수정 시각
-    created_at = Column(DateTime, default=func.current_timestamp(), comment='생성 시간')
-    updated_at = Column(
-        DateTime,
-        default=func.current_timestamp(),
-        onupdate=func.current_timestamp(),
-        comment='최종 수정 시간'
-    )
-    
-    def to_dict(self) -> dict:
-        """객체를 딕셔너리로 변환합니다."""
-        return {
-            'code_group': self.code_group,
-            'code': self.code,
-            'code_name': self.code_name,
-            'code_abbr': self.code_abbr,
-            'sort_order': self.sort_order,
-            'is_active': bool(self.is_active) if self.is_active is not None else True,
-            'description': self.description,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-        }
-    
-    @classmethod
-    def from_dict(cls, data: dict) -> 'CommonCode':
-        """딕셔너리로부터 객체를 생성합니다."""
-        return cls(
-            code_group=data.get('code_group'),
-            code=data.get('code'),
-            code_name=data.get('code_name'),
-            code_abbr=data.get('code_abbr'),
-            sort_order=data.get('sort_order', 0),
-            is_active=data.get('is_active', True),
-            description=data.get('description'),
-        )
-
-
 class VendorInfo(Base):
     """
     거래처정보 테이블 모델
@@ -382,4 +382,102 @@ class VendorInfo(Base):
             tax_type=data.get('tax_type'),
             business_status=data.get('business_status'),
             status_updated_at=status_updated_at,
+        )
+
+
+class CardTransaction(Base):
+    """
+    카드사용내역 테이블 모델
+    
+    카드사용내역을 저장합니다.
+    """
+    __tablename__ = 'card_transaction'
+    
+    # 자동 생성 기본 키
+    id = Column(Integer, primary_key=True, autoincrement=True, comment='기본 키')
+    
+    # 참조: 카드사 ID (FK -> card_company_info.id)
+    card_company_id = Column(Integer, ForeignKey('card_company_info.id'), nullable=False, comment='카드사 ID')
+    
+    # 거래 일자
+    transaction_date = Column(DateTime, nullable=False, comment='거래 일자')
+    
+    # 카드번호(마스킹)
+    masked_card_number = Column(String(50), comment='카드번호(마스킹)')
+    
+    # 거래취소여부 (Boolean: FALSE/0 = 정상거래, TRUE/1 = 취소거래)
+    is_cancel = Column(Boolean, default=False, nullable=False, comment='거래취소여부')
+    
+    # 거래 금액
+    amount = Column(Numeric(15, 2), nullable=False, comment='거래 금액')
+    
+    # 거래처명
+    vendor_name = Column(String(255), comment='거래처명')
+    
+    # 사업자등록번호
+    business_number = Column(String(10), comment='사업자등록번호')
+    
+    # 승인번호
+    approval_number = Column(String(20), comment='승인번호')
+    
+    # 참조: 카드 ID (FK -> card_info.id)
+    card_id = Column(Integer, ForeignKey('card_info.id'), comment='카드 ID')
+    
+    # 참조: 거래처 ID (FK -> vendor_info.id)
+    vendor_id = Column(Integer, ForeignKey('vendor_info.id'), comment='거래처 ID')
+    
+    # 생성/수정 시각
+    created_at = Column(DateTime, default=func.current_timestamp(), comment='생성 시간')
+    updated_at = Column(
+        DateTime,
+        default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+        comment='최종 수정 시간'
+    )
+    
+    # 관계 설정
+    card_company = relationship("CardCompanyInfo", backref="transactions")
+    card = relationship("CardInfo", backref="transactions")
+    vendor = relationship("VendorInfo", backref="transactions")
+    
+    def to_dict(self) -> dict:
+        """객체를 딕셔너리로 변환합니다."""
+        return {
+            'id': self.id,
+            'card_company_id': self.card_company_id,
+            'transaction_date': self.transaction_date.isoformat() if self.transaction_date else None,
+            'masked_card_number': self.masked_card_number,
+            'is_cancel': bool(self.is_cancel) if self.is_cancel is not None else False,
+            'amount': float(self.amount) if self.amount is not None else None,
+            'vendor_name': self.vendor_name,
+            'business_number': self.business_number,
+            'approval_number': self.approval_number,
+            'card_id': self.card_id,
+            'vendor_id': self.vendor_id,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
+    
+    @classmethod
+    def from_dict(cls, data: dict) -> 'CardTransaction':
+        """딕셔너리로부터 객체를 생성합니다."""
+        from datetime import datetime
+        transaction_date = data.get('transaction_date')
+        if isinstance(transaction_date, str):
+            try:
+                transaction_date = datetime.fromisoformat(transaction_date.replace('Z', '+00:00'))
+            except:
+                transaction_date = None
+        
+        return cls(
+            card_company_id=data.get('card_company_id'),
+            transaction_date=transaction_date,
+            masked_card_number=data.get('masked_card_number'),
+            is_cancel=data.get('is_cancel', False),
+            amount=data.get('amount'),
+            vendor_name=data.get('vendor_name'),
+            business_number=data.get('business_number'),
+            approval_number=data.get('approval_number'),
+            card_id=data.get('card_id'),
+            vendor_id=data.get('vendor_id'),
         )

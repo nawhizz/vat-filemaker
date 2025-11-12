@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Optional
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from app.repositories.schema import Base, BusinessInfo, CardCompanyInfo, CardInfo, CommonCode, VendorInfo
+from app.repositories.schema import Base, BusinessInfo, CardCompanyInfo, CardInfo, CommonCode, VendorInfo, CardTransaction
 from app.config.settings import settings
 
 
@@ -166,6 +166,11 @@ class DatabaseInitializer:
             vendor_info_sql = Path(__file__).parent / "sql" / "vendor_info.sql"
             if vendor_info_sql.exists():
                 self.execute_sql_file(str(vendor_info_sql))
+            
+            # card_transaction.sql 실행
+            card_transaction_sql = Path(__file__).parent / "sql" / "card_transaction.sql"
+            if card_transaction_sql.exists():
+                self.execute_sql_file(str(card_transaction_sql))
             
             print("데이터베이스 초기화가 완료되었습니다!")
             
