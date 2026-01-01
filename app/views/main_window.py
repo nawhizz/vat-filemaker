@@ -20,6 +20,7 @@ from app.views.card_company_view import CardCompanyInterface
 from app.views.card_view import CardInterface
 from app.views.common_code_view import CommonCodeInterface
 from app.views.vendor_view import VendorInterface
+from app.views.card_transaction_view import CardTransactionInterface
 
 
 class MainWindow(FluentWindow):
@@ -109,6 +110,16 @@ class MainWindow(FluentWindow):
             self.vendor_interface,
             FluentIcon.SHOPPING_CART,
             "거래처정보 관리",
+            NavigationItemPosition.TOP
+        )
+        
+        # 카드사용내역 등록 페이지 추가
+        self.card_transaction_interface = CardTransactionInterface()
+        self.card_transaction_interface.setObjectName("card_transaction_interface")
+        self.addSubInterface(
+            self.card_transaction_interface,
+            FluentIcon.DOCUMENT,
+            "카드사용내역 등록",
             NavigationItemPosition.TOP
         )
         
